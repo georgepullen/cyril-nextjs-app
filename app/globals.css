@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: rgb(2 6 23);
   --foreground: #171717;
 }
 
@@ -24,4 +24,25 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #265dd200;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1e4ea100;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #265dd200 transparent;
 }
