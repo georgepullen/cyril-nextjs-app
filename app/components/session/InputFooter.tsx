@@ -9,6 +9,7 @@ interface InputFooterProps {
   setInput: React.Dispatch<React.SetStateAction<string>>;
   disabled: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
+  setIsTyping: (typing: boolean) => void;
 }
 
 const InputFooter: React.FC<InputFooterProps> = ({
@@ -16,38 +17,37 @@ const InputFooter: React.FC<InputFooterProps> = ({
   input,
   setInput,
   disabled,
+  setIsTyping,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!disabled) {
-      inputRef.current?.focus();
+      inputRef.current?.focus({ preventScroll: true });
     }
   }, [disabled]);
 
   return (
     <motion.footer
-      initial={{ opacity: 0, y: 50, scale: 0.9 }}
+      initial={{ opacity: 0, y: 0, scale: 1 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="sm:p-4 p-1 flex flex-col fixed bottom-0 left-0 right-0 z-10 bg-slate-900 bg-opacity-90 rounded-lg max-w-5xl sm:w-[80%] m-auto sm:mb-4 mb-1 focus:outline-none"
+      className="sm:p-4 p-2 rounded-lg w-full m-auto focus:outline-none sm:h-[13%] h-auto"
     >
       <div className="flex w-full sm:gap-4 gap-1">
         <a href="/reflect">
           <motion.button
-            whileHover={{ scale: 1.05, opacity: 1 }}
-            whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0.8 }}
             animate={{ opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="sm:px-4 sm:py-2 border-gray-600 border rounded-lg font-semibold transition-all duration-300 shadow-md focus:outline-none sm:text-xl text-white bg-gray-800 h-full"
+            className="rounded-lg font-semibold transition-all duration-300 focus:outline-none sm:text-xl text-white h-full"
           >
             <Image
               src="/history.svg"
               alt="Enter"
               width={40}
               height={40}
-              className="sm:h-8 h-5 w-10"
+              className="sm:h-8 h-8 w-auto"
+              priority={true}
             />
           </motion.button>
         </a>
@@ -55,20 +55,31 @@ const InputFooter: React.FC<InputFooterProps> = ({
           ref={inputRef}
           type="text"
           placeholder="Enter your message here..."
-          className="flex-1 sm:px-4 px-2 sm:text-xl text-sm sm:py-2 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-blue-500 focus:ring-4"
+          className="flex-1 px-4 sm:text-xl text-lg py-2 rounded-lg border border-gray-800 bg-slate-900 text-white focus:outline-none focus:ring-blue-500 focus:ring-1 sm:mx-0 mx-2 opacity-80"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !disabled && onSend(input)}
+          onChange={(e) => {
+            setInput(e.target.value);
+            setIsTyping(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !disabled) {
+              onSend(input);
+              setIsTyping(false);
+            }
+          }}
+          onBlur={() => setIsTyping(false)}
           disabled={disabled}
         />
         <motion.button
-          whileHover={{ scale: 1.05, opacity: 1 }}
-          whileTap={{ scale: 0.95 }}
           initial={{ opacity: 0.8 }}
           animate={{ opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          onClick={() => !disabled && onSend(input)}
-          className="bg-gray-800 sm:px-4 sm:py-2 border-gray-600 border rounded-lg font-semibold transition-all duration-300 shadow-md focus:outline-none sm:text-xl text-white"
+          onClick={() => {
+            if (!disabled) {
+              onSend(input);
+              setIsTyping(false);
+            }
+          }}
+          className="rounded-lg font-semibold transition-all duration-300 focus:outline-none sm:text-xl text-white"
           disabled={disabled}
         >
           <Image
@@ -76,7 +87,7 @@ const InputFooter: React.FC<InputFooterProps> = ({
             alt="Send"
             width={40}
             height={40}
-            className="sm:h-8 h-5 w-10"
+            className="sm:h-8 h-7 w-auto"
           />
         </motion.button>
       </div>

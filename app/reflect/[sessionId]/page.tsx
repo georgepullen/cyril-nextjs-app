@@ -1,17 +1,18 @@
 "use client";
 
-import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { useEffect, useState } from 'react';
 import { getMessagesForSession, getSessionHistory } from '../../utils/supabaseUtils';
-import BackgroundWrapper from '@/app/components/BackgroundWrapper';
+import BackgroundWrapper from '@/app/components/shared/BackgroundWrapper';
 import Image from 'next/image';
-import LogoAndTitle from '@/app/components/LogoAndTitle';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/app/utils/supabaseClient';
 
 
-function SessionPage({ params }: { params: { sessionId: string } }) {
-  const { user } = useUser();
+function ReflectOnSessionPage({ params }: { params: { sessionId: string } }) {
+  const { session, email } = useAuth();
+
   const { sessionId } = params;
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +25,21 @@ function SessionPage({ params }: { params: { sessionId: string } }) {
     created_at: ""
   });
 
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkSession = async () => {
+      console.log("called");
+      const { data } = await supabase.auth.getSession();
+      console.log(data.session);
+      if (!data.session) {
+        router.push('/login');
+      }
+    };
+
+    checkSession();
+  }, [router]);
+
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -35,6 +51,7 @@ function SessionPage({ params }: { params: { sessionId: string } }) {
         setError('Failed to load messages for this session. Please try again later.');
       } finally {
         setLoading(false);
+        console.log("Setting loading to false")
       }
     };
 
@@ -44,29 +61,30 @@ function SessionPage({ params }: { params: { sessionId: string } }) {
   useEffect(() => {
     const fetchSessionDetails = async () => {
       try {
-        const email = user?.email ?? '';
-        const sessionHistory = await getSessionHistory(email);
-    
+        const sessionHistory = await getSessionHistory(email as string);
+
         const session = sessionHistory.find(
           (session) => session.session_id === sessionId
         );
-    
+
         if (session) {
+          setError(null)
           setSessionDetails({
             session_number: session.session_number,
             created_at: session.created_at,
           });
         } else {
           setError('Session details not found.');
+          console.log("i set error here")
         }
       } catch (err) {
         console.error('Error fetching session details:', err);
         setError('Failed to fetch session details.');
       }
-    };    
+    };
 
     fetchSessionDetails();
-  }, [sessionId]);
+  }, [sessionId, session]);
 
   const copyMessagesToClipboard = () => {
     const chatLogs = messages
@@ -77,102 +95,52 @@ function SessionPage({ params }: { params: { sessionId: string } }) {
     });
   };
 
-  if (!user) {
-    return <></>;
-  }
-
   return (
-    <BackgroundWrapper overflow="scroll">
-      <div className="w-full h-full">
-        <div className="max-w-4xl 2xl:p-0 p-8 sm:pt-[5rem] mx-auto w-full sm:h-[15rem] flex flex-col items-start justify-center">
-          <LogoAndTitle />
-        </div>
-        <div className="w-full sm:py-10 px-6 overflow-scroll">
-          <div className="max-w-4xl mx-auto sm:p-6">
-            <header className="flex justify-between items-center mb-6">
-              <div className="flex flex-col">
-                <motion.h1
-                  className="sm:text-lg text-sm text-gray-200 font-bold"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                >
-                  Session {sessionDetails.session_number}
-                </motion.h1>
-                <motion.h2
-                  className="sm:text-lg text-gray-600 text-sm font-semibold"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-                >
-                  {user.name}
-                </motion.h2>
-              </div>
-              <a href="/reflect" className="text-blue-600 font-bold sm:text-lg text-sm sm:max-w-max max-w-[5rem] hover:underline">
-                &larr; Back to Sessions
-              </a>
-            </header>
+    <>
+      <BackgroundWrapper>
+        <div className="h-dvh flex flex-col items-center p-4 md:p-8 w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-4xl shadow-md rounded-md p-6 space-y-4"
+          >
+            <h1 className="text-2xl font-bold text-white">Session {sessionDetails.session_number}</h1>
 
-
-            {loading ? (
-              <></>
-            ) : error ? (
-              <p className="text-center text-red-600">{error}</p>
-            ) : messages.length === 0 ? (
-              <p className="text-center text-gray-600">No messages found for this session.</p>
-            ) : (
-              <motion.div
-                className="relative"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
+            <div className="flex justify-between items-center">
+              <a href="/reflect" className="text-blue-500 hover:underline">&larr; Reflection Room</a>
+              <button
+                onClick={copyMessagesToClipboard}
+                className="flex items-center space-x-2 text-sm text-gray-700 hover:text-gray-900"
               >
-                <button
-                  onClick={copyMessagesToClipboard}
-                  className="absolute top-0 right-0 p-4 opacity-60"
-                  aria-label="Copy All"
-                >
-                  <Image
-                    src="/copy.svg"
-                    alt="Copy Icon"
-                    width={18}
-                    height={18}
-                  />
-                </button>
+                <Image src="/copy.svg" alt="Copy" width={16} height={16} />
+                <span className="text-gray-300">Copy Transcript</span>
+              </button>
+            </div>
 
-                <motion.div
-                  className="overflow-auto mt-6 p-4 bg-black border-2 border-gray-800 rounded-lg text-sm"
-                  initial="hidden"
-                  animate="visible"
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.95 },
-                    visible: { opacity: 1, scale: 1 },
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {messages.map((msg) => (
-                    <motion.div
-                      key={msg.id}
-                      className={`mb-4 ${msg.role === 'ai'
-                        ? 'text-blue-800 bg-blue-50 border-l-4 border-blue-500 pl-3'
-                        : 'text-gray-800'
-                        }`}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 * messages.indexOf(msg) }}
-                    >
-                      <span className="font-mono font-semibold">{msg.name}:</span>{' '}
-                      <span className="font-mono">{msg.content}</span>
-                    </motion.div>
+            <div className="bg-slate-900 opacity-80 border border-slate-700 rounded-md p-4 overflow-auto">
+              {loading ? (
+                <p className="text-gray-500">Loading messages...</p>
+              ) : error ? (
+                <p className="text-red-500">{error}</p>
+              ) : (
+                <div className="space-y-2">
+                  {messages.map((msg, index) => (
+                    <div key={index} className="text-sm font-mono">
+                      <span className="font-bold">
+                        {msg.role === 'ai' ? 'Cyril' : 'Human'}:
+                      </span>{' '}
+                      <span>{msg.content}</span>
+                    </div>
                   ))}
-                </motion.div>
-              </motion.div>
-            )}
-          </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </BackgroundWrapper>
+      </BackgroundWrapper>
+    </>
   );
 }
 
-export default withPageAuthRequired(SessionPage);
+export default ReflectOnSessionPage;

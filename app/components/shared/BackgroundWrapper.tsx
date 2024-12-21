@@ -14,7 +14,6 @@ export default function BackgroundWrapper({ children, overflow = 'hidden' }: Pro
         overflow,
       }}
     >
-      {/* Background Image with Blur */}
       <div
         className="absolute inset-0 -z-10 bg-slate-950"
         style={{
@@ -24,8 +23,6 @@ export default function BackgroundWrapper({ children, overflow = 'hidden' }: Pro
           filter: 'blur(10px)',
         }}
       ></div>
-
-      {/* Content */}
       {children}
     </div>
   );

@@ -1,4 +1,3 @@
-// hooks/useErrorHandling.ts
 import { useState } from 'react';
 
 export const useErrorHandling = () => {

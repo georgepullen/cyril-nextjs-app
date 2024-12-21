@@ -1,9 +1,9 @@
-// hooks/useSession.ts
 import { useState, useEffect } from 'react';
-import { ensureUserExists, getSessionId, getMessagesForSession, incrementSession } from '../utils/supabaseUtils';
+import { getSession, getMessagesForSession, incrementSession } from '../utils/supabaseUtils';
 
-export const useSession = (user: any) => {
+export const useSession = (email: any) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionNumber, setSessionNumber] = useState<number | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,32 +11,31 @@ export const useSession = (user: any) => {
     async function initializeSession() {
       try {
         setError(null);
-        const userData = await ensureUserExists(user.email, user.name, user.picture);
-        if (!userData) throw new Error('Failed to ensure user exists.');
+        const { id, session_number } = await getSession(email);
+        if (!id) return null;
 
-        const id = await getSessionId(user.email, user.name, user.picture);
-        if (!id) throw new Error('No session ID found for the user.');
         setSessionId(id);
+        setSessionNumber(session_number);
 
         const sessionMessages = await getMessagesForSession(id);
         setMessages(sessionMessages);
       } catch (error) {
         console.error('Error initializing session:', error);
-        setError('Failed to initialize session. Please try again later.');
+        setError('Failed to initialize session.');
       }
     }
 
     initializeSession();
-  }, [user.email]);
+  }, [email, sessionId]);
 
   const incrementSessionId = async () => {
     try {
       setError(null);
-      const updatedUser = await incrementSession(user.email);
-      if (!updatedUser || !updatedUser.session_id) throw new Error('Failed to increment session.');
-      setSessionId(updatedUser.session_id);
+      const updatedSession = await incrementSession(email);
+      if (!updatedSession || !updatedSession.id) throw new Error('Failed to increment session.');
+      setSessionId(updatedSession.id);
       setMessages([]);
-      return updatedUser.session_id;
+      return updatedSession.id;
     } catch (error) {
       console.error('Error incrementing session:', error);
       setError('Failed to start a new session. Please try again later.');
@@ -44,5 +43,5 @@ export const useSession = (user: any) => {
     }
   };
 
-  return { sessionId, messages, setMessages, error, setError, incrementSessionId };
+  return { sessionId, sessionNumber, messages, setMessages, error, setError, incrementSessionId };
 };

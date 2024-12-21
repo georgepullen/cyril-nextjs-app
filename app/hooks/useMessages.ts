@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import { insertMessage } from '../utils/supabaseUtils';
 
-export const useMessages = (sessionId: string | null, user: any) => {
+export const useMessages = (sessionId: string | null, email: any) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [evolving, setEvolving] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const apiUrl = process.env.NEXT_PUBLIC_CHAT_API;
 
   const sendMessage = async (input: string) => {
     if (!input.trim() || !sessionId) return;
@@ -13,18 +15,15 @@ export const useMessages = (sessionId: string | null, user: any) => {
     const userMessage = {
       role: 'user',
       content: input,
-      name: user.name,
-      picture: user.picture,
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
 
     try {
-      await insertMessage({ sessionId, email: user.email, role: 'user', content: input });
+      await insertMessage({ sessionId, email: email, role: 'user', content: input });
 
-      
-      const response = await fetch('http://localhost:5000/chat/', {
+      const response = await fetch(apiUrl as string, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: input, sessionId }),
@@ -33,15 +32,11 @@ export const useMessages = (sessionId: string | null, user: any) => {
       if (!response.ok) throw new Error('Failed to get a response from the server.');
 
       const data = await response.json();
-      
 
       if (data.session_at_capacity) {
-        console.log("This is called now")
         const evolveMessage = {
           role: 'evolve',
-          content: 'Ready for Cyril to evolve?',
-          name: 'Session Concluded',
-          picture: '/logo.svg',
+          content: 'Your session with Cyril has concluded. Please click "evolve" to begin another.',
         };
         setEvolving(true);
         setMessages((prev) => [...prev, evolveMessage]);
@@ -49,10 +44,8 @@ export const useMessages = (sessionId: string | null, user: any) => {
         const aiMessage = {
           role: 'ai',
           content: data.reply,
-          name: 'CyrilAI',
-          picture: '/logo.svg',
         };
-        await insertMessage({ sessionId, email: user.email, role: 'ai', content: data.reply });
+        await insertMessage({ sessionId, email: email, role: 'ai', content: data.reply });
         setMessages((prev) => [...prev, aiMessage]);
       }
     } catch (error) {

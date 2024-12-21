@@ -1,4 +1,3 @@
-// hooks/useInput.ts
 import { useState } from 'react';
 
 export const useInput = (inputRef: React.RefObject<HTMLInputElement>) => {

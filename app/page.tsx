@@ -1,22 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
-import LogoAndTitle from './components/LogoAndTitle';
-import ChatNowButton from './components/CallToAction';
-import Footer from './components/Footer';
-import BackgroundWrapper from './components/BackgroundWrapper';
-import ReleaseNotes from './components/ReleaseNotes';
-import BulletPoints from './components/SubTitle';
-import SubTitle from './components/SubTitle';
-import CallToAction from './components/CallToAction';
+import LogoAndTitle from './components/shared/LogoAndTitle';
+import BackgroundWrapper from './components/shared/BackgroundWrapper';
+import SubTitle from './components/home/SubTitle';
+import CallToAction from './components/home/CallToAction';
+import CopyrightFooter from './components/shared/CopyrightFooter';
 
 export default function Home() {
-  const [releaseNotes, setReleaseNotes] = useState('');
-
-  useEffect(() => {
-    fetch('/release_notes.md')
-      .then(response => response.text())
-      .then(text => setReleaseNotes(text));
-  }, []);
 
   return (
     <>
@@ -26,7 +15,7 @@ export default function Home() {
           <SubTitle />
           <CallToAction />
         </main>
-        <Footer />
+        <CopyrightFooter />
       </BackgroundWrapper>
     </>
   );

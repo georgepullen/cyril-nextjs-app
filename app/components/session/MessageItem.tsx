@@ -7,8 +7,6 @@ interface MessageProps {
   message: {
     role: 'user' | 'ai' | 'error' | 'evolve' | 'typing';
     content: string;
-    name: string | null | undefined;
-    picture: string | null | undefined;
   };
   onNewSession: () => void;
 }
@@ -26,34 +24,24 @@ const MessageItem: React.FC<MessageProps> = ({ message, onNewSession }) => {
       className={`w-full flex ${message.role !== 'user' ? 'justify-start' : 'justify-end'}`}
     >
       <div
-        className={`flex items-center gap-4 w-full max-w-3xl ${message.role !== 'user' ? 'flex-row' : 'flex-row-reverse'
+        className={`flex items-center gap-4 w-full max-w-max ${message.role !== 'user' ? 'flex-row' : 'flex-row-reverse'
           }`}
       >
-        <Image
-          src={message.picture || '/default-profile.png'}
-          alt={`${message.name || 'User'}'s picture`}
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
         <div
           className={`flex flex-col px-4 py-4 rounded-lg shadow-md sm:text-base text-sm font-medium text-white whitespace-pre-line w-full 
             ${isError
-              ? 'bg-red-500'
+              ? 'bg-gray-800 text-red-500'
               : isEvolve
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500'
                 : message.role === 'ai'
                   ? 'bg-gray-800'
                   : isTyping
-                    ? 'bg-gray-700'
-                    : 'bg-gradient-to-r from-blue-400 to-blue-500'
+                    ? 'bg-gray-800'
+                    : 'bg-gradient-to-r from-blue-900 to-blue-800'
             }`}
         >
-          <span className={`font-bold text-sm mb-1 ${isError ? 'text-white' : ''}`}>
-            {message.name || (isError ? 'Error' : 'User')}
-          </span>
           {isTyping ? (
-            <div className="flex gap-1 items-center mt-2">
+            <div className="flex gap-1 items-center">
               <motion.span
                 className="h-2 w-2 bg-white rounded-full"
                 animate={{ opacity: [0.3, 1, 0.3] }}
@@ -81,20 +69,25 @@ const MessageItem: React.FC<MessageProps> = ({ message, onNewSession }) => {
               animate={{ opacity: 1 }}
               onClick={onNewSession}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="mt-4 relative font-extrabold px-4 rounded-lg flex flex-row items-center sm:gap-2 gap-2 bg-slate-900 w-full justify-center py-2 overflow-hidden max-w-max"
+              className="mt-4 relative font-extrabold px-6 rounded-lg flex flex-row items-center sm:gap-2 gap-2 bg-slate-900 w-full justify-center py-2 overflow-hidden max-w-max"
             >
               <Image
                 src="/lab.svg"
                 alt="Enter"
                 width={40}
                 height={40}
-                className="h-8 w-10"
+                className="h-8 w-auto"
               />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-700">Evolve</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 hover:opacity-50 transition-opacity duration-300 pointer-events-none">
                 <div className="absolute inset-0 w-full h-full"></div>
               </div>
             </motion.button>
+          )}
+          {isError && (
+            <>
+              <p className="text-gray-400">Cyril is offline at the moment.<br></br>Please contact <a href="mailto:george@cyril.guru" className="text-blue-400 hover:underline">george@cyril.guru</a> to arrange a period of guaranteed uptime.<br></br>Feel free to review your previous sessions while you wait.</p>
+            </>
           )}
         </div>
       </div>

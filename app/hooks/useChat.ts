@@ -1,11 +1,10 @@
-// hooks/useChat.ts
 import { useSession } from './useSession';
 import { useMessages } from './useMessages';
 import { useInput } from './useInput';
 
-export const useChat = (user: any, inputRef: React.RefObject<HTMLInputElement>) => {
-  const { sessionId, messages: storedMessages, setMessages, error, setError, incrementSessionId } = useSession(user);
-  const { messages, sendMessage, evolving, setEvolving, loading, resetMessages } = useMessages(sessionId, user);
+export const useChat = (email: any, inputRef: React.RefObject<HTMLInputElement>) => {
+  const { sessionId, sessionNumber, messages: storedMessages, setMessages, error, setError, incrementSessionId } = useSession(email);
+  const { messages, sendMessage, evolving, setEvolving, loading, resetMessages } = useMessages(sessionId, email);
   const { input, setInput, resetInput } = useInput(inputRef);
 
   const allMessages = [...storedMessages, ...messages];
@@ -26,6 +25,7 @@ export const useChat = (user: any, inputRef: React.RefObject<HTMLInputElement>) 
 
   return {
     messages: allMessages,
+    sessionNumber,
     input,
     setInput,
     inputRef,
