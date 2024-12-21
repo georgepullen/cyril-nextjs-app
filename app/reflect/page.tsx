@@ -10,7 +10,7 @@ import { supabase } from '../utils/supabaseClient';
 
 export default function Reflect() {
   const [sessionHistory, setSessionHistory] = useState<any[]>([]);
-  const { session, email } = useAuth();
+  const { email } = useAuth();
   const router = useRouter();
 
   useEffect(() => {

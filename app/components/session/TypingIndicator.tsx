@@ -4,10 +4,8 @@ import MessageItem from './MessageItem';
 
 const TypingIndicator: React.FC = () => {
   const exampleMessage = {
-    role: 'typing' as 'typing',
+    role: 'typing' as const,
     content: '',
-    name: 'Cyril AI',
-    picture: '/logo.svg'
   };
 
   const handleNewSession = () => {

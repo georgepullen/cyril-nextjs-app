@@ -3,7 +3,7 @@ import { useMessages } from './useMessages';
 import { useInput } from './useInput';
 
 export const useChat = (email: any, inputRef: React.RefObject<HTMLInputElement>) => {
-  const { sessionId, sessionNumber, messages: storedMessages, setMessages, error, setError, incrementSessionId } = useSession(email);
+  const { sessionId, sessionNumber, messages: storedMessages, setMessages, error, incrementSessionId } = useSession(email);
   const { messages, sendMessage, evolving, setEvolving, loading, resetMessages } = useMessages(sessionId, email);
   const { input, setInput, resetInput } = useInput(inputRef);
 

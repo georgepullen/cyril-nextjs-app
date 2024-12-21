@@ -84,7 +84,7 @@ function ReflectOnSessionPage({ params }: { params: { sessionId: string } }) {
     };
 
     fetchSessionDetails();
-  }, [sessionId, session]);
+  }, [sessionId, session, email]);
 
   const copyMessagesToClipboard = () => {
     const chatLogs = messages

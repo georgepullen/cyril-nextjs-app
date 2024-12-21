@@ -9,7 +9,7 @@ import { useChat } from "../hooks/useChat";
 import { supabase } from "../utils/supabaseClient";
 
 export default function Session() {
-  const { session, email } = useAuth();
+  const { email } = useAuth();
   const [isTyping, setIsTyping] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,7 +36,7 @@ export default function Session() {
     if (showLogoAndTitle === false) {
       setEvolving(false);
     }
-  }, [showLogoAndTitle]);
+  }, [showLogoAndTitle, setEvolving]);
 
   useEffect(() => {
     if (evolving && triggerSessionLoader) {
