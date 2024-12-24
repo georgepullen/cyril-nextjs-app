@@ -1,7 +1,8 @@
 import { AuthProvider } from "./contexts/AuthContext";
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
+import ServerStatus from "./components/shared/ServerStatus";
 
 export const metadata: Metadata = {
   title: "Cyril",
@@ -23,15 +24,14 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Cyril" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-
       </head>
-      <body
-        className={`antialiased`}
-      >
+      <body className="antialiased">
         <AuthProvider>
-          {children}
+          <ServerStatus>
+            {children}
+          </ServerStatus>
         </AuthProvider>
-        <Analytics/>
+        <Analytics />
       </body>
     </html>
   );
