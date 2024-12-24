@@ -20,7 +20,8 @@ export default function ServerStatus({ children }: { children: React.ReactNode }
                 } else {
                     setIsOnline(false);
                 }
-            } catch (error) {
+            } catch (error: any) {
+                console.error(error)
                 setIsOnline(false);
             }
         };
