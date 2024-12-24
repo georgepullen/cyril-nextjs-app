@@ -86,7 +86,7 @@ const MessageItem: React.FC<MessageProps> = ({ message, onNewSession }) => {
           )}
           {isError && (
             <>
-              <p className="text-gray-400">Cyril is offline at the moment.<br></br>Please contact <a href="mailto:george@cyril.guru" className="text-blue-400 hover:underline">george@cyril.guru</a> to arrange a period of guaranteed uptime.<br></br>Feel free to review your previous sessions while you wait.</p>
+              <p className="text-gray-400">Cyril is offline at the moment.<br></br>Please contact <a href="mailto:george@cyril.guru" className="text-blue-400 hover:underline">george@cyril.guru</a> to arrange a period of guaranteed uptime.</p>
             </>
           )}
         </div>

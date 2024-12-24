@@ -1,11 +1,8 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import BackgroundWrapper from "./BackgroundWrapper";
-import LogoAndTitle from "./LogoAndTitle";
 import { motion } from 'framer-motion';
-import CopyrightFooter from "./CopyrightFooter";
-
+import Image from "next/image";
 
 export default function ServerStatus({ children }: { children: React.ReactNode }) {
     const [isOnline, setIsOnline] = useState<boolean | null>(null);
@@ -37,22 +34,18 @@ export default function ServerStatus({ children }: { children: React.ReactNode }
         return (
             <>
                 <BackgroundWrapper>
-                    <div className="flex items-center justify-center w-full max-w-lg h-dvh">
-                        <div className="mx-auto w-full sm:pl-0 pl-8">
-                            <LogoAndTitle />
-                            <div className="pt-6"></div>
+                    <div className="flex items-center justify-center w-full h-dvh md:px-[20%] px-[1%]">
+                        <div className="h-[50%] rounded-lg flex flex-col items-start justify-center p-4">
+                            <h1 className="font-extrabold text-white text-center w-full md:text-4xl text-2xl pb-6">Cyril is Offline</h1>
                             <motion.h2
-                                className="font-semibold text-left 2xl:text-3xl sm:text-2xl text-xl w-full"
+                                className="md:text-lg text-sm text-center w-full text-gray-300"
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3, duration: 0.5, ease: "easeOut" }}
                             >
-                                Cyril is <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-700">offline</span> at the moment.<br />Please try again later.
+                                Please contact <a href="mailto:george@cyril.guru" className="text-blue-400 hover:underline">george@cyril.guru</a> to arrange a period of guaranteed uptime.
                             </motion.h2>
                         </div>
-                    </div>
-                    <div className="w-full max-w-lg">
-                        <CopyrightFooter />
                     </div>
                 </BackgroundWrapper>
             </>
