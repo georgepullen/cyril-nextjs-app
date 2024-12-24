@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import BackgroundWrapper from "./BackgroundWrapper";
 import { motion } from 'framer-motion';
-import Image from "next/image";
 
 export default function ServerStatus({ children }: { children: React.ReactNode }) {
     const [isOnline, setIsOnline] = useState<boolean | null>(null);
