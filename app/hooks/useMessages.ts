@@ -1,6 +1,6 @@
 "use client"
 import { useState } from 'react';
-import { insertMessage } from '../utils/supabaseUtils';
+import { getLatestMessage, insertMessage } from '../utils/supabaseUtils';
 
 export const useMessages = (sessionId: string | null, email: any) => {
   const [messages, setMessages] = useState<any[]>([]);
@@ -26,7 +26,7 @@ export const useMessages = (sessionId: string | null, email: any) => {
       const response = await fetch(apiUrl as string, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: input, sessionId }),
+        body: JSON.stringify({ sessionId }),
       });
 
       if (!response.ok) throw new Error('Failed to get a response from the server.');
@@ -41,11 +41,12 @@ export const useMessages = (sessionId: string | null, email: any) => {
         setEvolving(true);
         setMessages((prev) => [...prev, evolveMessage]);
       } else {
+        const latestMessage = await getLatestMessage(sessionId, 'ai');
         const aiMessage = {
           role: 'ai',
-          content: data.reply,
+          content: latestMessage.content,
         };
-        await insertMessage({ sessionId, email: email, role: 'ai', content: data.reply });
+        await insertMessage({ sessionId, email: email, role: 'ai', content: latestMessage.content! });
         setMessages((prev) => [...prev, aiMessage]);
       }
     } catch (error) {

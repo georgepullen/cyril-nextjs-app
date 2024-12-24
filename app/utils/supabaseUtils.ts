@@ -225,3 +225,28 @@ export type UserSessionsAndMessages = {
     created_at: string;
   }[];
 };
+
+export const getLatestMessage = async (
+  sessionId: string,
+  role: string = 'ai'
+): Promise<{ content: string | null }> => {
+  if (!sessionId) {
+    return { content: null };
+  }
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('content')
+    .eq('session_id', sessionId)
+    .eq('role', role)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching latest message for session ID: ${sessionId} and role: ${role}. Details:`, error);
+    return { content: null };
+  }
+
+  return { content: data?.content || null };
+};
