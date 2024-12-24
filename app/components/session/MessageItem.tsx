@@ -21,7 +21,7 @@ const MessageItem: React.FC<MessageProps> = ({ message, onNewSession }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`w-full flex ${message.role !== 'user' ? 'justify-start' : 'justify-end'}`}
+      className={`w-full flex ${message.role !== 'user' ? 'pr-[25%] justify-start' : 'pl-[25%] justify-end'}`}
     >
       <div
         className={`flex items-center gap-4 w-full max-w-max ${message.role !== 'user' ? 'flex-row' : 'flex-row-reverse'
