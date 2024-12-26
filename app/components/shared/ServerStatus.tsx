@@ -42,7 +42,8 @@ export default function ServerStatus({ children }: { children: React.ReactNode }
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3, duration: 0.5, ease: "easeOut" }}
                             >
-                                Please contact <a href="mailto:george@cyril.guru" className="text-blue-400 hover:underline">george@cyril.guru</a> to arrange a period of guaranteed uptime.
+                                Please contact <a href="mailto:george@cyril.guru" className="text-blue-400 hover:underline">george@cyril.guru</a> to arrange a period of guaranteed uptime.<br />
+                                <a href="/" className="text-blue-400 text-center mt-auto hover:underline">&larr; Return to Home Page</a>
                             </motion.h2>
                         </div>
                     </div>

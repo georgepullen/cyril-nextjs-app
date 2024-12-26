@@ -2,7 +2,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
-import ServerStatus from "./components/shared/ServerStatus";
 
 export const metadata: Metadata = {
   title: "Cyril",
@@ -27,9 +26,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <AuthProvider>
-          <ServerStatus>
             {children}
-          </ServerStatus>
         </AuthProvider>
         <Analytics />
       </body>

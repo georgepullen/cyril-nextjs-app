@@ -7,6 +7,7 @@ import SessionLoader from "../components/session/SessionLoader";
 import { useRouter } from "next/navigation";
 import { useChat } from "../hooks/useChat";
 import { supabase } from "../utils/supabaseClient";
+import ServerStatus from "../components/shared/ServerStatus";
 
 export default function Session() {
   const { email } = useAuth();
@@ -51,26 +52,28 @@ export default function Session() {
   };
 
   return (
-    <BackgroundWrapper>
-      {showLogoAndTitle ? (
-        <SessionLoader
-          sessionNumber={sessionNumber as number}
-          onComplete={() => setShowLogoAndTitle(false)}
-        />
-      ) : (
-        <ChatContainer
-          messages={messages}
-          loading={loading && !evolving}
-          onNewSession={handleNewSession}
-          isTyping={isTyping}
-          input={input}
-          setInput={setInput}
-          onSend={handleSend}
-          disabled={loading || evolving || showLogoAndTitle}
-          inputRef={inputRef}
-          setIsTyping={setIsTyping}
-        />
-      )}
-    </BackgroundWrapper>
+    <ServerStatus>
+      <BackgroundWrapper>
+        {showLogoAndTitle ? (
+          <SessionLoader
+            sessionNumber={sessionNumber as number}
+            onComplete={() => setShowLogoAndTitle(false)}
+          />
+        ) : (
+          <ChatContainer
+            messages={messages}
+            loading={loading && !evolving}
+            onNewSession={handleNewSession}
+            isTyping={isTyping}
+            input={input}
+            setInput={setInput}
+            onSend={handleSend}
+            disabled={loading || evolving || showLogoAndTitle}
+            inputRef={inputRef}
+            setIsTyping={setIsTyping}
+          />
+        )}
+      </BackgroundWrapper>
+    </ServerStatus>
   );
 }
