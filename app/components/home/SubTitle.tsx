@@ -10,7 +10,7 @@ export default function SubTitle() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.5, ease: "easeOut" }}
       >
-        An LLM that <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-700">Evolves</span> to Meet The Needs of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-700">Your Clients</span>
+        Teaching LLMs to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-700">Adapt</span> Their <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-700">Speech Style</span> Overtime
       </motion.h2>
     </>
   );

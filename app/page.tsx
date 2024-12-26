@@ -3,7 +3,7 @@ import LogoAndTitle from './components/shared/LogoAndTitle';
 import BackgroundWrapper from './components/shared/BackgroundWrapper';
 import SubTitle from './components/home/SubTitle';
 import CallToAction from './components/home/CallToAction';
-import CopyrightFooter from './components/shared/CopyrightFooter';
+import Footer from './components/shared/Footer';
 
 export default function Home() {
 
@@ -15,7 +15,7 @@ export default function Home() {
           <SubTitle />
           <CallToAction />
         </main>
-        <CopyrightFooter />
+        <Footer />
       </BackgroundWrapper>
     </>
   );

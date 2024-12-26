@@ -1,14 +1,13 @@
 import React from 'react';
 import Image from 'next/image';
 
-const CopyrightFooter = () => {
+const Footer = () => {
   return (
     <footer className="text-white py-6 w-full max-w-lg">
       <div className="sm:px-0 px-6 flex flex-row justify-between items-center">
         <div className="text-left">
-          <p className="text-sm">&copy; {new Date().getFullYear()} Cyril Evolve</p>
-          <p className="text-xs text-gray-300">Created by George Pullen</p>
-          <p className="text-xs">
+          <p className="sm:text-sm text-xs text-gray-300">Created by George Pullen</p>
+          <p className="sm:text-sm text-xs">
             <a href="mailto:george@cyril.guru" className="text-blue-400 hover:underline">
               george@cyril.guru
             </a>
@@ -28,4 +27,4 @@ const CopyrightFooter = () => {
   );
 };
 
-export default CopyrightFooter;
+export default Footer;
