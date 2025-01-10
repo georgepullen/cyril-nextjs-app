@@ -5,56 +5,48 @@ import TimelineSection from './components/home/Timeline';
 import Footer from './components/home/Footer';
 import { LabSection } from './components/home/LabSection';
 import { OverviewSection } from './components/home/OverviewSection';
-import { Navbar } from './components/home/Navbar';
 import { HeroSection } from './components/home/HeroSection';
+import { Navbar } from './components/home/Navbar';
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [cursorVariant, setCursorVariant] = useState("default");
+  const [showCursor, setShowCursor] = useState(false);
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 1000);
+    const hasMouse = window.matchMedia("(hover: hover)").matches;
+    setShowCursor(hasMouse);
 
-    const handleMouseMove = (e: MouseEvent) => {
-      cursorX.set(e.clientX - 16);
-      cursorY.set(e.clientY - 16);
-    };
+    if (hasMouse) {
+      const handleMouseMove = (e: MouseEvent) => {
+        cursorX.set(e.clientX - 16);
+        cursorY.set(e.clientY - 16);
+      };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+      };
+    }
   }, [cursorX, cursorY]);
 
   useEffect(() => {
+    const timer = setTimeout(() => setIsLoaded(true), 1000);
+
     const handleScroll = () => {
       const offset = window.scrollY;
       setScrolled(offset > 100);
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
-
-  const handleNavClick = (e: any, id: any) => {
-    e.preventDefault();
-    const element = document.getElementById(id);
-    if (!element) return;
-
-    const navbar = document.querySelector('nav');
-    const navbarHeight = navbar ? navbar.offsetHeight : 0;
-    const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth"
-    });
-  };
 
   return (
     <main className="min-h-screen bg-[#0D0D15] text-white overflow-x-hidden font-mono">
@@ -79,22 +71,24 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <motion.div
-        className="fixed w-8 h-8 rounded-full pointer-events-none z-50 mix-blend-difference"
-        style={{
-          x: cursorX,
-          y: cursorY,
-          backgroundColor: cursorVariant === "hover" ? "#BE95FF" : "#FF7C00"
-        }}
-        animate={{
-          scale: cursorVariant === "hover" ? 1.5 : 1
-        }}
-        transition={{ duration: 0.2 }}
-      />
+      {showCursor && (
+        <motion.div
+          className="fixed w-8 h-8 rounded-full pointer-events-none z-50 mix-blend-difference"
+          style={{
+            x: cursorX,
+            y: cursorY,
+            backgroundColor: cursorVariant === "hover" ? "#BE95FF" : "#FF7C00"
+          }}
+          animate={{
+            scale: cursorVariant === "hover" ? 1.5 : 1
+          }}
+          transition={{ duration: 0.2 }}
+        />
+      )}
 
       <div className="fixed inset-0 pointer-events-none bg-[linear-gradient(45deg,transparent_0%,rgba(190,149,255,0.05)_50%,rgba(255,124,0,0.05)_100%)] animate-[gradientShift_10s_ease-in-out_infinite] z-40" />
 
-      <Navbar handleNavClick={handleNavClick} scrolled={scrolled} setCursorVariant={setCursorVariant} />
+      <Navbar scrolled={scrolled} setCursorVariant={setCursorVariant} />
 
       <HeroSection isLoaded={isLoaded}/>
 
