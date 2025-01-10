@@ -28,7 +28,7 @@ export default function Home() {
       clearTimeout(timer);
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [cursorX, cursorY]);
 
   useEffect(() => {
     const handleScroll = () => {

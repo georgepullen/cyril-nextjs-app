@@ -18,7 +18,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ isLoaded }) => {
             <AnimatePresence>
                 {isLoaded && (
                     <div className="space-y-4 md:space-y-6 text-center relative w-full">
-                        {phrases.map((phrase, index) => (
+                        {phrases.map((phrase) => (
                             <motion.div
                                 key={phrase.text}
                                 initial={{ y: 40, opacity: 0 }}
