@@ -1,37 +1,14 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
-import TimelineSection from './components/home/Timeline';
-import Footer from './components/home/Footer';
-import { LabSection } from './components/home/LabSection';
-import { OverviewSection } from './components/home/OverviewSection';
-import { HeroSection } from './components/home/HeroSection';
+import { motion, AnimatePresence } from 'framer-motion';
+import TimelineSection from './components/home/TimelineSection';
 import { Navbar } from './components/home/Navbar';
+import HeroSection from './components/home/HeroSection';
+import AuthSection from './components/home/AuthSection';
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [cursorVariant, setCursorVariant] = useState("default");
-  const [showCursor, setShowCursor] = useState(false);
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-
-  useEffect(() => {
-    const hasMouse = window.matchMedia("(hover: hover)").matches;
-    setShowCursor(hasMouse);
-
-    if (hasMouse) {
-      const handleMouseMove = (e: MouseEvent) => {
-        cursorX.set(e.clientX - 16);
-        cursorY.set(e.clientY - 16);
-      };
-
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-      };
-    }
-  }, [cursorX, cursorY]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 1000);
@@ -71,34 +48,15 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {showCursor && (
-        <motion.div
-          className="fixed w-8 h-8 rounded-full pointer-events-none z-50 mix-blend-difference"
-          style={{
-            x: cursorX,
-            y: cursorY,
-            backgroundColor: cursorVariant === "hover" ? "#BE95FF" : "#FF7C00"
-          }}
-          animate={{
-            scale: cursorVariant === "hover" ? 1.5 : 1
-          }}
-          transition={{ duration: 0.2 }}
-        />
-      )}
-
       <div className="fixed inset-0 pointer-events-none bg-[linear-gradient(45deg,transparent_0%,rgba(190,149,255,0.05)_50%,rgba(255,124,0,0.05)_100%)] animate-[gradientShift_10s_ease-in-out_infinite] z-40" />
 
-      <Navbar scrolled={scrolled} setCursorVariant={setCursorVariant} />
+      <Navbar scrolled={scrolled} />
 
-      <HeroSection isLoaded={isLoaded}/>
-
-      <OverviewSection />
+      <HeroSection isLoaded={isLoaded} />
 
       <TimelineSection />
 
-      <LabSection setCursorVariant={setCursorVariant}/>
-
-      <Footer scrolled={scrolled} />
+      <AuthSection />
 
       <style jsx global>{`
       @keyframes gradientShift {
@@ -125,6 +83,16 @@ export default function Home() {
       ::selection {
         background: #BE95FF;
         color: #0D0D15;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
       }
     `}</style>
     </main>

@@ -1,61 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-
-const lerp = (start: any, end: any, t: any) => {
-    return start * (1 - t) + end * t;
-};
-
-const generatePoint = () => ({
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 2 + 1,
-    targetX: Math.random() * 100,
-    targetY: Math.random() * 100
-});
+import { Menu, X, Github, Linkedin } from 'lucide-react';
 
 interface NavbarProps {
-    setCursorVariant: any,
-    scrolled: any
+    scrolled: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ setCursorVariant, scrolled }) => {
+export const Navbar: React.FC<NavbarProps> = ({ scrolled }) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [points, setPoints] = useState(() => Array.from({ length: 15 }, generatePoint));
     const [activeSection, setActiveSection] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const navItems = ['overview', 'timeline', 'lab'];
-
-    const updatePoints = useCallback(() => {
-        setPoints(prevPoints =>
-            prevPoints.map(point => {
-                const newX = lerp(point.x, point.targetX, 0.005);
-                const newY = lerp(point.y, point.targetY, 0.005);
-
-                const isNearTarget =
-                    Math.abs(newX - point.targetX) < 0.1 &&
-                    Math.abs(newY - point.targetY) < 0.1;
-
-                return {
-                    ...point,
-                    x: newX,
-                    y: newY,
-                    targetX: isNearTarget ? Math.random() * 100 : point.targetX,
-                    targetY: isNearTarget ? Math.random() * 100 : point.targetY
-                };
-            })
-        );
-    }, []);
-
-
-    useEffect(() => {
-        const animationFrame = requestAnimationFrame(function animate() {
-            updatePoints();
-            requestAnimationFrame(animate);
-        });
-
-        return () => cancelAnimationFrame(animationFrame);
-    }, [updatePoints]);
+    const navItems = ['overview', 'timeline', 'access'];
 
     const handleMobileNavClick = (item: string) => {
         const element = document.getElementById(item);
@@ -70,12 +25,8 @@ export const Navbar: React.FC<NavbarProps> = ({ setCursorVariant, scrolled }) =>
         setIsMobileMenuOpen(false);
     };
 
-
     return (
-        <nav
-            className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'py-2' : 'py-4'
-                }`}
-        >
+        <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'py-2' : 'py-4'}`}>
             <div className="relative">
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -83,97 +34,44 @@ export const Navbar: React.FC<NavbarProps> = ({ setCursorVariant, scrolled }) =>
                     className="absolute inset-0 -z-10 backdrop-blur-sm"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-[#BE95FF]/10 to-[#FF7C00]/10" />
-
-                    <svg className="absolute inset-0 w-full h-full">
-                        {points.map((point, i) => (
-                            points.slice(i + 1, i + 4).map((target, j) => (
-                                <motion.line
-                                    key={`${i}-${j}`}
-                                    x1={`${point.x}%`}
-                                    y1={`${point.y}%`}
-                                    x2={`${target.x}%`}
-                                    y2={`${target.y}%`}
-                                    stroke={`url(#gradient-${i}-${j})`}
-                                    strokeWidth="0.3"
-                                    strokeOpacity="0.1"
-                                    initial={{ pathLength: 0 }}
-                                    animate={{ pathLength: 1 }}
-                                    transition={{
-                                        duration: 5,
-                                        repeat: Infinity,
-                                    }}
-                                >
-                                    <defs>
-                                        <linearGradient id={`gradient-${i}-${j}`}>
-                                            <stop offset="0%" stopColor="#BE95FF" />
-                                            <stop offset="100%" stopColor="#FF7C00" />
-                                        </linearGradient>
-                                    </defs>
-                                </motion.line>
-                            ))
-                        ))}
-                    </svg>
-
-
-                    {points.map((point, i) => (
-                        <motion.div
-                            key={i}
-                            className="absolute w-1 h-1 rounded-full bg-gradient-to-r from-[#BE95FF] to-[#FF7C00]"
-                            style={{
-                                left: `${point.x}%`,
-                                top: `${point.y}%`,
-                                scale: point.size,
-                            }}
-                            animate={{
-                                opacity: [0.2, 0.4, 0.2],
-                                scale: [point.size, point.size * 1.1, point.size],
-                            }}
-                            transition={{
-                                duration: 6,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                                delay: i * 0.2,
-                            }}
-                        />
-                    ))}
-
                 </motion.div>
 
                 <div className="max-w-6xl mx-auto px-4">
                     <div className="flex items-center justify-between">
-                        <motion.div
-                            className="relative group"
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                        >
-                            <span className="text-2xl font-light tracking-[0.4em] bg-gradient-to-r from-[#BE95FF] to-[#FF7C00] text-transparent bg-clip-text">
-                                CYRIL
-                            </span>
-                            <AnimatePresence>
-                                {isHovered && (
-                                    <motion.div
-                                        initial={{ scaleX: 0 }}
-                                        animate={{ scaleX: 1 }}
-                                        exit={{ scaleX: 0 }}
-                                        className="absolute -bottom-1 left-0 w-full h-px bg-gradient-to-r from-[#BE95FF] to-[#FF7C00]"
-                                    />
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
+                        <div className="flex items-center space-x-8">
+                            <motion.div
+                                className="relative group"
+                                onMouseEnter={() => setIsHovered(true)}
+                                onMouseLeave={() => setIsHovered(false)}
+                            >
+                                <span className="text-2xl font-light tracking-[0.4em] bg-gradient-to-r from-[#BE95FF] to-[#FF7C00] text-transparent bg-clip-text">
+                                    CYRIL
+                                </span>
+                                <AnimatePresence>
+                                    {isHovered && (
+                                        <motion.div
+                                            initial={{ scaleX: 0 }}
+                                            animate={{ scaleX: 1 }}
+                                            exit={{ scaleX: 0 }}
+                                            className="absolute -bottom-1 left-0 w-full h-px bg-gradient-to-r from-[#BE95FF] to-[#FF7C00]"
+                                        />
+                                    )}
+                                </AnimatePresence>
+                            </motion.div>
 
-                        <div className="hidden md:flex space-x-8">
+                            <div className="hidden lg:flex items-center space-x-2 text-xs">
+                                <span className="text-gray-400 tracking-[0.2em]">CREATED_BY</span>
+                                <span className="text-[#BE95FF] tracking-[0.3em] font-light">GEORGE PULLEN</span>
+                            </div>
+                        </div>
+
+                        <div className="hidden lg:flex items-center space-x-8">
                             {navItems.map((item) => (
                                 <motion.div
                                     key={item}
                                     className="relative"
-                                    onHoverStart={() => {
-                                        setCursorVariant("hover");
-                                        setActiveSection(item);
-                                    }}
-                                    onHoverEnd={() => {
-                                        setCursorVariant("default");
-                                        setActiveSection('');
-                                    }}
+                                    onHoverStart={() => setActiveSection(item)}
+                                    onHoverEnd={() => setActiveSection('')}
                                 >
                                     <motion.a
                                         href={`#${item}`}
@@ -183,7 +81,6 @@ export const Navbar: React.FC<NavbarProps> = ({ setCursorVariant, scrolled }) =>
                                     >
                                         {item}
                                     </motion.a>
-
                                     <AnimatePresence>
                                         {activeSection === item && (
                                             <motion.div
@@ -196,10 +93,31 @@ export const Navbar: React.FC<NavbarProps> = ({ setCursorVariant, scrolled }) =>
                                     </AnimatePresence>
                                 </motion.div>
                             ))}
+
+                            <div className="flex items-center space-x-4">
+                                <motion.a
+                                    href="https://github.com/georgepullen"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
+                                    whileHover={{ scale: 1.1 }}
+                                >
+                                    <Github className="w-5 h-5" />
+                                </motion.a>
+                                <motion.a
+                                    href="https://uk.linkedin.com/in/george-pullen-73693027b"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
+                                    whileHover={{ scale: 1.1 }}
+                                >
+                                    <Linkedin className="w-5 h-5" />
+                                </motion.a>
+                            </div>
                         </div>
 
                         <button
-                            className="md:hidden p-2"
+                            className="lg:hidden p-2"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             aria-label="Toggle mobile menu"
                         >
@@ -217,7 +135,7 @@ export const Navbar: React.FC<NavbarProps> = ({ setCursorVariant, scrolled }) =>
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
-                                className="md:hidden overflow-hidden"
+                                className="lg:hidden overflow-hidden"
                             >
                                 <div className="py-4 space-y-4">
                                     {navItems.map((item) => (
@@ -238,6 +156,30 @@ export const Navbar: React.FC<NavbarProps> = ({ setCursorVariant, scrolled }) =>
                                             </motion.a>
                                         </motion.div>
                                     ))}
+                                    <div className="pt-4 flex flex-col space-y-4">
+                                        <div className="flex flex-col space-y-1">
+                                            <span className="text-gray-400 text-xs tracking-[0.2em]">CREATED_BY</span>
+                                            <span className="text-[#BE95FF] text-sm tracking-[0.3em] font-light">GEORGE PULLEN</span>
+                                        </div>
+                                        <div className="flex space-x-4">
+                                            <a
+                                                href="https://github.com/georgepullen"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
+                                            >
+                                                <Github className="w-5 h-5" />
+                                            </a>
+                                            <a
+                                                href="https://uk.linkedin.com/in/george-pullen-73693027b"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
+                                            >
+                                                <Linkedin className="w-5 h-5" />
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </motion.div>
                         )}
