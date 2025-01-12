@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TimelineSection from './components/home/TimelineSection';
 import { Navbar } from './components/home/Navbar';
-import HeroSection from './components/home/HeroSection';
-import AuthSection from './components/home/AuthSection';
+import HeroSection from './components/home/HeroSection/HeroSection';
+import AccessSection from './components/home/AccessSection/AccessSection';
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -56,13 +56,13 @@ export default function Home() {
 
       <TimelineSection />
 
-      <AuthSection />
+      <AccessSection />
 
       <style jsx global>{`
       @keyframes gradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        100% { background-poswas funny ￼￼. He was from Sierra Leoneition: 0% 50%; }
       }
 
       .bg-gradient-animate {

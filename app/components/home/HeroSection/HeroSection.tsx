@@ -33,14 +33,14 @@ const HeroSection: React.FC<HeroProps> = ({ isLoaded }) => {
         }, 2000);
 
         return () => clearInterval(interval);
-    }, [statusMessages]);
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
             setActiveFeature((prev) => (prev + 1) % features.length);
         }, 3000);
         return () => clearInterval(interval);
-    }, [features.length]);
+    }, []);
 
     const handleMouseMove = (event: React.MouseEvent) => {
         const { currentTarget, clientX, clientY } = event;
