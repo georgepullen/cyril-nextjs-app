@@ -19,26 +19,26 @@ const TimelineSection = () => {
 
   const timeline = [
     {
-      year: "2025 Q2",
-      phase: "Alpha Release",
+      year: "2025 Q1",
+      phase: "Phase One",
       icon: MapPin,
       title: "Architecture Deployment",
-      description: "Initial deployment of market analysis capabilities. Alpha Testers given access to product.",
-      achievement: "Milestone: First successful market prediction",
+      description: "Initial deployment of model with conversational abilities. Service will have limited uptime.",
+      achievement: "Milestone: 50 unique users",
       tech: ["LCM Framework", "Evolving Parameters"]
     },
     {
       year: "2025 Q3",
-      phase: "Beta Launch",
+      phase: "Phase Two",
       icon: TestTube,
-      title: "Increased Accuracy",
-      description: "Scaled architecture to improve market predictions. Introduction of real-time data processing.",
-      achievement: "Milestone: 50% prediction accuracy",
+      title: "Market Analysis",
+      description: "Integration of real-time market analysis features. Increased uptime.",
+      achievement: "Milestone: 50% uptime",
       tech: ["Real-time Processing"]
     },
     {
       year: "2026 Q2",
-      phase: "Full Release",
+      phase: "Phase Three",
       icon: Rocket,
       title: "Automated Trading",
       description: "Launch of automated trading capabilities with preemptive risk management.",
