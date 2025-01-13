@@ -7,10 +7,9 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ scrolled }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const [activeSection, setActiveSection] = useState('');
+    const [isHovered, setIsHovered] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const navItems = ['overview', 'timeline', 'access'];
+    const navItems = ['overview', 'ecosystem', 'gateway'];
 
     const handleMobileNavClick = (item: string) => {
         const element = document.getElementById(item);
@@ -31,37 +30,39 @@ export const Navbar: React.FC<NavbarProps> = ({ scrolled }) => {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="absolute inset-0 -z-10 backdrop-blur-sm"
+                    className="absolute inset-0 -z-10 backdrop-blur-md"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#BE95FF]/10 to-[#FF7C00]/10" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#BE95FF]/5 to-[#FF7C00]/5 border-b border-[#BE95FF]/10" />
                 </motion.div>
 
-                <div className="max-w-6xl mx-auto px-4">
+                <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-8">
                             <motion.div
                                 className="relative group"
-                                onMouseEnter={() => setIsHovered(true)}
-                                onMouseLeave={() => setIsHovered(false)}
+                                onHoverStart={() => setIsHovered('logo')}
+                                onHoverEnd={() => setIsHovered('')}
                             >
-                                <span className="text-2xl font-light tracking-[0.4em] bg-gradient-to-r from-[#BE95FF] to-[#FF7C00] text-transparent bg-clip-text">
-                                    CYRIL
+                                <span className="text-3xl font-bold bg-gradient-to-r from-[#BE95FF] to-[#FF7C00] bg-clip-text text-transparent">
+                                    <a href="/">CYRIL</a>
                                 </span>
                                 <AnimatePresence>
-                                    {isHovered && (
+                                    {isHovered === 'logo' && (
                                         <motion.div
                                             initial={{ scaleX: 0 }}
                                             animate={{ scaleX: 1 }}
                                             exit={{ scaleX: 0 }}
-                                            className="absolute -bottom-1 left-0 w-full h-px bg-gradient-to-r from-[#BE95FF] to-[#FF7C00]"
+                                            className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#BE95FF] to-[#FF7C00]"
                                         />
                                     )}
                                 </AnimatePresence>
                             </motion.div>
 
-                            <div className="hidden lg:flex items-center space-x-2 text-xs">
-                                <span className="text-gray-400 tracking-[0.2em]">CREATED_BY</span>
-                                <span className="text-[#BE95FF] tracking-[0.3em] font-light">GEORGE PULLEN</span>
+                            <div className="hidden lg:flex items-center space-x-2">
+                                <span className="text-sm text-gray-400">Created by</span>
+                                <span className="text-sm font-medium bg-gradient-to-r from-[#BE95FF] to-[#FF7C00] bg-clip-text text-transparent">
+                                    George Pullen
+                                </span>
                             </div>
                         </div>
 
@@ -70,61 +71,60 @@ export const Navbar: React.FC<NavbarProps> = ({ scrolled }) => {
                                 <motion.div
                                     key={item}
                                     className="relative"
-                                    onHoverStart={() => setActiveSection(item)}
-                                    onHoverEnd={() => setActiveSection('')}
+                                    onHoverStart={() => setIsHovered(item)}
+                                    onHoverEnd={() => setIsHovered('')}
                                 >
                                     <motion.a
                                         href={`#${item}`}
                                         onClick={() => handleMobileNavClick(item)}
-                                        className="block uppercase text-sm tracking-[0.3em] py-2 relative z-10"
-                                        whileHover={{ color: '#BE95FF' }}
+                                        className="block px-4 py-2 text-sm font-medium capitalize relative z-10 hover:text-[#BE95FF] transition-colors"
                                     >
                                         {item}
                                     </motion.a>
                                     <AnimatePresence>
-                                        {activeSection === item && (
+                                        {isHovered === item && (
                                             <motion.div
-                                                initial={{ scale: 0, opacity: 0 }}
-                                                animate={{ scale: 1, opacity: 1 }}
-                                                exit={{ scale: 0, opacity: 0 }}
-                                                className="absolute -inset-4 -z-10 rounded-lg bg-gradient-to-r from-[#BE95FF]/5 to-[#FF7C00]/5"
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                className="absolute inset-0 -z-10 rounded-lg bg-gradient-to-r from-[#BE95FF]/10 to-[#FF7C00]/10 border border-[#BE95FF]/20"
                                             />
                                         )}
                                     </AnimatePresence>
                                 </motion.div>
                             ))}
 
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-4 ml-4">
                                 <motion.a
                                     href="https://github.com/georgepullen"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
-                                    whileHover={{ scale: 1.1 }}
+                                    className="p-2 rounded-lg hover:bg-[#BE95FF]/10 transition-colors"
+                                    whileHover={{ scale: 1.05 }}
                                 >
-                                    <Github className="w-5 h-5" />
+                                    <Github className="w-5 h-5 text-gray-400" />
                                 </motion.a>
                                 <motion.a
                                     href="https://uk.linkedin.com/in/george-pullen-73693027b"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
-                                    whileHover={{ scale: 1.1 }}
+                                    className="p-2 rounded-lg hover:bg-[#BE95FF]/10 transition-colors"
+                                    whileHover={{ scale: 1.05 }}
                                 >
-                                    <Linkedin className="w-5 h-5" />
+                                    <Linkedin className="w-5 h-5 text-gray-400" />
                                 </motion.a>
                             </div>
                         </div>
 
                         <button
-                            className="lg:hidden p-2"
+                            className="lg:hidden p-2 rounded-lg hover:bg-[#BE95FF]/10 transition-colors"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             aria-label="Toggle mobile menu"
                         >
                             {isMobileMenuOpen ? (
-                                <X className="w-6 h-6 text-gray-600" />
+                                <X className="w-6 h-6 text-gray-400" />
                             ) : (
-                                <Menu className="w-6 h-6 text-gray-600" />
+                                <Menu className="w-6 h-6 text-gray-400" />
                             )}
                         </button>
                     </div>
@@ -141,43 +141,47 @@ export const Navbar: React.FC<NavbarProps> = ({ scrolled }) => {
                                     {navItems.map((item) => (
                                         <motion.div
                                             key={item}
-                                            className="relative"
                                             initial={{ x: -20, opacity: 0 }}
                                             animate={{ x: 0, opacity: 1 }}
                                             exit={{ x: -20, opacity: 0 }}
+                                            className="relative"
                                         >
                                             <motion.a
                                                 href={`#${item}`}
                                                 onClick={() => handleMobileNavClick(item)}
-                                                className="block uppercase text-sm tracking-[0.3em] py-2 relative z-10"
-                                                whileHover={{ color: '#BE95FF' }}
+                                                className="block px-4 py-2 text-sm font-medium capitalize hover:text-[#BE95FF] transition-colors"
                                             >
                                                 {item}
                                             </motion.a>
                                         </motion.div>
                                     ))}
-                                    <div className="pt-4 flex flex-col space-y-4">
-                                        <div className="flex flex-col space-y-1">
-                                            <span className="text-gray-400 text-xs tracking-[0.2em]">CREATED_BY</span>
-                                            <span className="text-[#BE95FF] text-sm tracking-[0.3em] font-light">GEORGE PULLEN</span>
-                                        </div>
-                                        <div className="flex space-x-4">
-                                            <a
-                                                href="https://github.com/georgepullen"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
-                                            >
-                                                <Github className="w-5 h-5" />
-                                            </a>
-                                            <a
-                                                href="https://uk.linkedin.com/in/george-pullen-73693027b"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-gray-400 hover:text-[#FF7C00] transition-colors duration-300"
-                                            >
-                                                <Linkedin className="w-5 h-5" />
-                                            </a>
+                                    
+                                    <div className="border-t border-[#BE95FF]/10 pt-4 mt-4">
+                                        <div className="px-4 space-y-4">
+                                            <div className="flex flex-col space-y-1">
+                                                <span className="text-sm text-gray-400">Created by</span>
+                                                <span className="text-sm font-medium bg-gradient-to-r from-[#BE95FF] to-[#FF7C00] bg-clip-text text-transparent">
+                                                    George Pullen
+                                                </span>
+                                            </div>
+                                            <div className="flex space-x-4">
+                                                <a
+                                                    href="https://github.com/georgepullen"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="p-2 rounded-lg hover:bg-[#BE95FF]/10 transition-colors"
+                                                >
+                                                    <Github className="w-5 h-5 text-gray-400" />
+                                                </a>
+                                                <a
+                                                    href="https://uk.linkedin.com/in/george-pullen-73693027b"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="p-2 rounded-lg hover:bg-[#BE95FF]/10 transition-colors"
+                                                >
+                                                    <Linkedin className="w-5 h-5 text-gray-400" />
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

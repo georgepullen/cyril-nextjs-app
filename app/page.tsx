@@ -1,10 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import TimelineSection from './components/home/TimelineSection';
 import { Navbar } from './components/home/Navbar';
 import HeroSection from './components/home/HeroSection/HeroSection';
-import AccessSection from './components/home/AccessSection/AccessSection';
+import EcosystemSection from './components/home/EcosystemSection/Ecosystem';
+import Access from './components/home/GatewaySection/Access';
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -52,11 +52,11 @@ export default function Home() {
 
       <Navbar scrolled={scrolled} />
 
-      <HeroSection isLoaded={isLoaded} />
+      <HeroSection />
 
-      <TimelineSection />
+      <EcosystemSection />
 
-      <AccessSection />
+      <Access />
 
       <style jsx global>{`
       @keyframes gradientShift {
