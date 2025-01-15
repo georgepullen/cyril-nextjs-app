@@ -89,7 +89,7 @@ const Access: React.FC = () => {
               {[
                 { icon: Shield, text: "Passwordless Authentication" },
                 { icon: Lock, text: "One-Time Passcode Verification" },
-                { icon: Server, text: "Email is Stored Securely on Server" }
+                { icon: Server, text: "Only Your Email is Stored" }
               ].map((item, index) => (
                 <motion.div
                   key={index}

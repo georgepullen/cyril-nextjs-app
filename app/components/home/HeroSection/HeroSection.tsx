@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
@@ -17,9 +17,6 @@ const HeroSection: React.FC = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-6xl mx-auto text-center">
-        <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 hidden sm:block">
-          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-[#BE95FF] opacity-60" />
-        </div>
 
         <div className="mb-6">
           <span className="inline-block px-3 sm:px-4 py-1 text-xs sm:text-sm font-medium rounded-full bg-gradient-to-r from-[#BE95FF]/10 to-[#FF7C00]/10 border border-[#BE95FF]/20">
