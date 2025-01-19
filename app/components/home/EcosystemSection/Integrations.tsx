@@ -19,7 +19,7 @@ export const integrations: Integration[] = [
         description: 'Retention-optimized note-taking platform that evolves with your knowledge.',
         features: ['Retention Prediction', 'Guided Review'],
         icon: BookText,
-        releaseDate: 'January 21, 2025',
+        releaseDate: 'January 28, 2025',
         gradient: 'from-[#BE95FF] via-[#FF7C00] to-[#BE95FF]',
         delay: 0.6,
         position: 'right',
