@@ -70,7 +70,6 @@ const Access: React.FC = () => {
   return (
     <section id="gateway" className="relative min-h-screen flex">
       <div className="hidden lg:flex lg:w-1/2 bg-[#0D0D15] relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#BE95FF]/10 via-[#FF7C00]/5 to-[#BE95FF]/10" />
         <div className="relative w-full h-full flex flex-col justify-center items-center p-12 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
