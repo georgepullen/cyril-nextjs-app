@@ -3,48 +3,36 @@ import { HTMLMotionProps, motion } from 'framer-motion';
 import { Mail, Github, Linkedin } from 'lucide-react';
 
 const Footer = () => {
-    const fadeInUp = {
-        initial: { y: 20, opacity: 0 },
-        whileInView: { y: 0, opacity: 1 },
-        transition: { duration: 0.5 }
-    };
-
     return (
-        <footer className="relative bg-[#0D0D15]/80 backdrop-blur-md border-t border-[#b35cff]/10 pt-12 pb-8 overflow-hidden">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#b35cff]/10 rounded-full blur-3xl -z-10" />
-            <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#ffad4a]/10 rounded-full blur-3xl -z-10" />
-
-            <div className="max-w-7xl mx-auto px-4">
-                <motion.div {...fadeInUp} className="flex flex-col items-center text-center space-y-6 mb-12">
-                    <h3 className="text-2xl font-bold text-white">CYRIL</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed max-w-lg">
-                        Created by George Pullen.
-                    </p>
-                    <div className="flex space-x-4">
+        <footer className="relative bg-[#0A0A12] py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                    <div className="flex items-center space-x-6">
                         <IconWrapper href="mailto:george@cyril.guru" aria-label="Email">
-                            <Mail className="w-5 h-5 text-gray-400 hover:text-[#b35cff]" />
+                            <Mail className="w-4 h-4 text-[#b35cff]" />
                         </IconWrapper>
                         <IconWrapper href="https://github.com/georgepullen" aria-label="GitHub">
-                            <Github className="w-5 h-5 text-gray-400 hover:text-[#BE95FF]" />
+                            <Github className="w-4 h-4 text-[#b35cff]" />
                         </IconWrapper>
                         <IconWrapper href="https://www.linkedin.com/in/george-pullen-73693027b/" aria-label="LinkedIn">
-                            <Linkedin className="w-5 h-5 text-gray-400 hover:text-[#BE95FF]" />
+                            <Linkedin className="w-4 h-4 text-[#b35cff]" />
                         </IconWrapper>
                     </div>
-                </motion.div>
 
-                <motion.div
-                    {...fadeInUp}
-                    className="border-t border-[#b35cff]/10 pt-8 flex flex-col md:flex-row justify-between items-center"
-                >
-                    <p className="text-gray-400 text-sm mb-4 md:mb-0">
-                        © {new Date().getFullYear()} CYRIL GURU
-                    </p>
-                    <div className="flex space-x-6 text-gray-400 text-sm">
-                        <a href="/privacy" className="hover:text-[#b35cff] transition-colors">Privacy</a>
-                        <a href="/terms" className="hover:text-[#b35cff] transition-colors">Terms</a>
+                    <div className="flex items-center space-x-6">
+                        <a href="/privacy" className="text-xs text-gray-500 hover:text-gray-400 transition-colors">
+                            Privacy
+                        </a>
+                        <span className="text-gray-700">•</span>
+                        <a href="/terms" className="text-xs text-gray-500 hover:text-gray-400 transition-colors">
+                            Terms
+                        </a>
+                        <span className="text-gray-700">•</span>
+                        <span className="text-xs text-gray-500">
+                            © {new Date().getFullYear()} CYRIL
+                        </span>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </footer>
     );
@@ -58,9 +46,9 @@ type IconWrapperProps = {
 const IconWrapper: React.FC<IconWrapperProps> = ({ children, href, ...props }) => (
     <motion.a
         href={href}
-        className="p-2 bg-white/5 rounded-full hover:bg-[#b35cff]/20 transition-colors"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        className="p-2 hover:bg-white/5 rounded-full transition-colors duration-200"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         target="_blank"
         rel="noopener noreferrer"
         {...props}

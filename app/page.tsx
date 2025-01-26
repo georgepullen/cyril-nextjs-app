@@ -1,10 +1,12 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { Navbar } from './components/Navbar';
-import RoadmapSection from './components/Roadmap';
 import Footer from './components/Footer';
+import ParticleBackground from './components/ParticleBackground';
+import HeroSection from './components/HeroSection';
+import EvolutionSection from './components/EvolutionSection';
 
-export default function Home() {
+export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -21,27 +23,23 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0D0D15] text-white overflow-x-hidden font-mono">
-      <>
-        <div className="fixed inset-0 pointer-events-none bg-[linear-gradient(45deg,transparent_0%,rgba(179,92,255,0.05)_50%,rgba(255,173,74,0.05)_100%)] animate-[gradientShift_10s_ease-in-out_infinite] z-40" />
+      <ParticleBackground />
+      <div className="fixed inset-0 pointer-events-none bg-[linear-gradient(45deg,transparent_0%,rgba(179,92,255,0.05)_50%,rgba(255,173,74,0.05)_100%)] animate-[gradientShift_10s_ease-in-out_infinite] z-10" />
 
+      <div className="relative z-20">
         <Navbar scrolled={scrolled} />
-
-        <RoadmapSection />
-
+        
+        <HeroSection />
+        <EvolutionSection />
+        
         <Footer />
-      </>
+      </div>
 
       <style jsx global>{`
         @keyframes gradientShift {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
 
         .animate-spin-slow {
@@ -49,12 +47,8 @@ export default function Home() {
         }
 
         @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
 
         ::-webkit-scrollbar {

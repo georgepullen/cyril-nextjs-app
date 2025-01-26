@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Memory } from '../../utils/supabaseUtils';
 import { formatDistanceToNow } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import MemoryEditor from './MemoryEditor';
+import { Edit2, Save, X, Menu } from 'lucide-react';
+import KeyboardKey from './KeyboardKey';
 
 interface MemoryCardProps {
   memory: Memory;
@@ -15,6 +17,7 @@ interface MemoryCardProps {
   onSave: () => void;
   onCancel: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
+  onToggleSidebar?: () => void;
 }
 
 const MemoryCard: React.FC<MemoryCardProps> = ({
@@ -27,55 +30,89 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
   onSave,
   onCancel,
   onKeyDown,
+  onToggleSidebar,
 }) => {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const handleConfirmDelete = () => {
-    // onDelete();
-    setShowDeleteConfirm(false);
-  };
-
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="h-12 bg-[#1E1E2E] border-b border-purple-500/20 
-                    flex items-center justify-between px-4 flex-shrink-0">
-        <span className="text-sm font-medium truncate flex-1">
-          {isEditing ? 'Editing Memory' : memory.content.split('\n')[0]}
-        </span>
-        <div className="flex-shrink-0 ml-2">
+      {/* Header */}
+      <div className="h-16 bg-[#1E1E2E]/90 backdrop-blur-xl border-b border-[#b35cff]/20 
+                    flex items-center justify-between px-6 flex-shrink-0">
+        <div className="flex items-center space-x-4">
+          <span className="text-lg font-medium bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent">
+            {isEditing ? 'Editing Memory' : 'Memory'}
+          </span>
+        </div>
+        <div className="flex items-center space-x-4">
           {isEditing ? (
-            <div className="flex space-x-2">
+            <>
               <button
                 onClick={onCancel}
-                className="px-3 py-1.5 text-sm text-gray-400 hover:text-gray-300 
-                         hover:bg-gray-500/10 rounded-md transition-colors duration-200"
+                className="p-2 text-gray-400 hover:text-gray-300 
+                          hover:bg-gray-500/10 rounded-lg transition-colors duration-200
+                          focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50"
+                title="Cancel (Esc)"
+                aria-label="Cancel editing"
               >
-                Cancel
+                <X className="w-5 h-5" />
               </button>
               <button
                 onClick={onSave}
                 disabled={isLoading || !editContent.trim()}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-200
-                          ${isLoading || !editContent.trim() 
-                            ? 'text-purple-400/50 cursor-not-allowed' 
-                            : 'text-purple-400 hover:text-purple-300 hover:bg-purple-400/10'}`}
+                className={`p-2 rounded-lg transition-all duration-200
+                          focus:outline-none focus:ring-2 
+                          ${isLoading || !editContent.trim()
+                            ? 'text-[#b35cff]/50 cursor-not-allowed'
+                            : 'text-[#b35cff] hover:bg-[#b35cff]/10 focus:ring-[#b35cff]/50'}`}
+                title="Save (Shift+Enter)"
+                aria-label="Save changes"
               >
-                {isLoading ? 'Saving...' : 'Save'}
+                <Save className="w-5 h-5" />
               </button>
-            </div>
+            </>
           ) : (
             <button
               onClick={onEdit}
-              className="px-3 py-1.5 text-sm text-purple-400 hover:text-purple-300 
-                       hover:bg-purple-400/10 rounded-md transition-colors duration-200"
+              className="p-2 text-[#b35cff] hover:bg-[#b35cff]/10 
+                        rounded-lg transition-colors duration-200
+                        focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50"
+              aria-label="Edit memory"
             >
-              Edit
+              <Edit2 className="w-5 h-5" />
             </button>
           )}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6" onClick={!isEditing ? onEdit : undefined}>
+      {/* Shortcuts Bar - Only show when editing */}
+      {isEditing && (
+        <div className="h-8 bg-[#161622] border-b border-[#b35cff]/20 
+                      flex items-center px-6 flex-shrink-0">
+          <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-2 text-gray-500 text-xs">
+              <div className="flex items-center space-x-1">
+                <KeyboardKey>SHIFT</KeyboardKey>
+                <span>+</span>
+                <KeyboardKey>ENTER</KeyboardKey>
+              </div>
+              <span>save</span>
+            </div>
+            <div className="flex items-center space-x-2 text-gray-500 text-xs">
+              <KeyboardKey>ESC</KeyboardKey>
+              <span>cancel</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content */}
+      <div 
+        className="flex-1 overflow-y-auto p-6" 
+        onClick={!isEditing ? onEdit : undefined}
+        role={!isEditing ? "button" : undefined}
+        tabIndex={!isEditing ? 0 : undefined}
+        onKeyDown={!isEditing ? (e) => e.key === 'Enter' && onEdit() : undefined}
+        aria-label={!isEditing ? "Click to edit memory" : undefined}
+      >
         {isEditing ? (
           <div className="h-full">
             <MemoryEditor
@@ -87,7 +124,9 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
             />
           </div>
         ) : (
-          <div className="prose prose-invert max-w-none">
+          <div className="prose prose-invert prose-p:text-gray-300 prose-headings:text-gray-200 
+                         prose-a:text-[#b35cff] prose-a:no-underline hover:prose-a:text-[#ffad4a] 
+                         prose-code:text-[#ffad4a] prose-pre:bg-[#1E1E2E] max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {memory.content}
             </ReactMarkdown>
@@ -95,46 +134,35 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
         )}
       </div>
 
-      <div className="h-8 bg-[#1E1E2E] border-t border-purple-500/20 
-                    flex items-center justify-between px-4 flex-shrink-0 text-xs">
-        <span className="text-gray-400 truncate">
-          Created {formatDistanceToNow(new Date(memory.created_at), { addSuffix: true })}
-          {memory.updated_at !== memory.created_at && 
-            ' • Updated ' + formatDistanceToNow(new Date(memory.updated_at), { addSuffix: true })}
-        </span>
-        {!isEditing && (
-          <span className="text-gray-400 ml-2 flex-shrink-0">
-            {memory.content.length}/500
+      {/* Footer */}
+      <div className="h-12 bg-[#1E1E2E]/90 backdrop-blur-xl border-t border-[#b35cff]/20 
+                    flex items-center justify-between px-6 flex-shrink-0">
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-400">
+            {memory.updated_at !== memory.created_at
+              ? 'Updated ' + formatDistanceToNow(new Date(memory.updated_at), { addSuffix: true })
+              : 'Created ' + formatDistanceToNow(new Date(memory.created_at), { addSuffix: true })}
           </span>
+          {!isEditing && (
+            <span className="text-sm text-gray-400">
+              {memory.content.length}/500
+            </span>
+          )}
+        </div>
+        
+        {/* Sidebar Toggle Button - Only show on mobile */}
+        {onToggleSidebar && (
+          <button
+            onClick={onToggleSidebar}
+            className="md:hidden p-2 text-[#b35cff] hover:bg-[#b35cff]/10 
+                      rounded-lg transition-colors duration-200
+                      focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50"
+            aria-label="Toggle sidebar"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
         )}
       </div>
-
-      {showDeleteConfirm && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-[#1E1E2E] p-6 rounded-lg border border-purple-500/20 max-w-md">
-            <h3 className="text-lg font-medium mb-4">Delete Memory?</h3>
-            <p className="text-gray-400 mb-6">
-              Are you sure you want to delete this memory? This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-gray-300 
-                         hover:bg-gray-500/10 rounded-md transition-colors duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                className="px-4 py-2 text-sm text-red-400 hover:text-red-300 
-                         hover:bg-red-400/10 rounded-md transition-colors duration-200"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

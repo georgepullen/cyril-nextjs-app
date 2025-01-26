@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import ImageInserter from './ImageInserter';
 
 interface MemoryEditorProps {
   content: string;
@@ -17,10 +18,57 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
   autoFocus = false,
   maxLength = 500,
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && e.shiftKey) {
+      // Submit on Shift+Enter
+      e.preventDefault();
+      onKeyDown(e);
+    } else if (e.key === 'Escape') {
+      // Pass through Escape key
+      onKeyDown(e);
+    } else if (e.key === 'i' && e.ctrlKey && e.shiftKey) {
+      // Ctrl+Shift+I for image insertion
+      e.preventDefault();
+      const imageButton = document.querySelector('[data-image-button]') as HTMLButtonElement;
+      if (imageButton) {
+        // Store current cursor position before clicking
+        const start = e.currentTarget.selectionStart;
+        const end = e.currentTarget.selectionEnd;
+        imageButton.click();
+        // Restore cursor position after click
+        setTimeout(() => {
+          e.currentTarget.focus();
+          e.currentTarget.setSelectionRange(start, end);
+        }, 0);
+      }
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
     if (newContent.length <= maxLength) {
       onChange(newContent);
+    }
+  };
+
+  const handleImageInsert = (markdown: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newContent = content.substring(0, start) + markdown + content.substring(end);
+    
+    if (newContent.length <= maxLength) {
+      onChange(newContent);
+      // Set cursor position after the inserted markdown
+      setTimeout(() => {
+        textarea.focus();
+        const newPosition = start + markdown.length;
+        textarea.setSelectionRange(newPosition, newPosition);
+      }, 0);
     }
   };
 
@@ -33,18 +81,33 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      <textarea
-        value={content}
-        onChange={handleChange}
-        onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        maxLength={maxLength}
-        className="flex-1 w-full bg-transparent text-white p-2 rounded-lg
-                  focus:outline-none placeholder-gray-400 resize-none font-mono"
-        autoFocus={autoFocus}
-      />
+      <div className="flex-1 relative">
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          maxLength={maxLength}
+          className="w-full h-full bg-transparent text-white p-2 rounded-lg
+                    focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50
+                    placeholder-gray-400 resize-none font-mono
+                    disabled:opacity-50 disabled:cursor-not-allowed"
+          autoFocus={autoFocus}
+          aria-label="Memory content"
+          aria-describedby="character-count"
+        />
+        <div className="absolute bottom-2 right-2">
+          <ImageInserter onInsert={handleImageInsert} />
+        </div>
+      </div>
       <div className="flex justify-end mt-2">
-        <span className={`text-xs ${getCharacterCountColor()} transition-colors duration-200`}>
+        <span 
+          id="character-count"
+          className={`text-xs ${getCharacterCountColor()} transition-colors duration-200`}
+          role="status"
+          aria-live="polite"
+        >
           {content.length}/{maxLength} characters
         </span>
       </div>

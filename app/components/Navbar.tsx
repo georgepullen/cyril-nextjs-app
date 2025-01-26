@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import Link from 'next/link';
-import { Book } from 'lucide-react';
+import { Code2 } from 'lucide-react';
 import Image from 'next/image';
 
 interface NavbarProps {
@@ -29,44 +29,41 @@ export const Navbar: React.FC<NavbarProps> = ({ scrolled }) => {
                         </Link>
                     </div>
 
+                    {/* Creator Credit */}
                     <div className="hidden md:block">
-                        <div className="ml-10 flex items-center space-x-8">
-                            <NavLink href="/journal">
-                                <div className="flex items-center px-6 py-2 bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 border border-[#b35cff]/20 rounded-full hover:from-[#b35cff]/20 hover:to-[#ffad4a]/20 transition-all duration-300">
-                                    <Book className="w-5 h-5 mr-3 text-[#b35cff]" />
-                                    <span className="text-base font-semibold bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent">
-                                        Feed Cyril
-                                    </span>
-                                </div>
-                            </NavLink>
-                        </div>
+                        <Link
+                            href="https://www.linkedin.com/in/george-pullen-73693027b/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center space-x-2 px-3 py-1.5 rounded-full 
+                                     bg-gradient-to-r from-[#b35cff]/5 to-[#ffad4a]/5
+                                     hover:from-[#b35cff]/10 hover:to-[#ffad4a]/10
+                                     border border-[#b35cff]/10 transition-all duration-300"
+                        >
+                            <Code2 className="w-4 h-4 text-[#b35cff] transition-transform duration-300 group-hover:rotate-12" />
+                            <span className="text-sm font-medium bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent">
+                                George Pullen
+                            </span>
+                        </Link>
                     </div>
 
+                    {/* Mobile Creator Credit */}
                     <div className="md:hidden">
                         <Link
-                            href="/journal"
-                            className="inline-flex items-center justify-center p-3 rounded-full bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 border border-[#b35cff]/20"
+                            href="https://www.linkedin.com/in/george-pullen-73693027b/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center w-9 h-9 rounded-full
+                                     bg-gradient-to-r from-[#b35cff]/5 to-[#ffad4a]/5
+                                     hover:from-[#b35cff]/10 hover:to-[#ffad4a]/10
+                                     border border-[#b35cff]/10"
                         >
-                            <Book className="h-6 w-6 text-[#b35cff]" />
+                            <Code2 className="w-4 h-4 text-[#b35cff]" />
                         </Link>
                     </div>
                 </div>
             </div>
         </nav>
-    );
-};
-
-const NavLink: React.FC<{ href: string; children: React.ReactNode }> = ({
-    href,
-    children,
-}) => {
-    return (
-        <Link
-            href={href}
-            className="transition-all duration-200"
-        >
-            {children}
-        </Link>
     );
 };
 
