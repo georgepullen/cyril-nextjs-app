@@ -1,252 +1,137 @@
 import { supabase } from './supabaseClient';
 
-export const getSession = async (
-  email: string
-): Promise<{ id: string | null; session_number: number | null }> => {
-  if (!email) {
-    return { id: null, session_number: null };
-  }
-  
-  const upsertResponse = await supabase
-    .from('sessions')
-    .upsert(
-      {
-        user_email: email,
-        session_number: 1,
-      },
-      {
-        onConflict: 'user_email,session_number',
-      }
-    )
-    .select()
-    .single();
+export interface Branch {
+  id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
+}
 
-  if (upsertResponse.error) {
-    console.error(
-      `Error upserting session for email: ${email}. Details:`,
-      upsertResponse.error
-    );
-    throw upsertResponse.error;
-  }
-
-  const { data, error } = await supabase
-    .from('sessions')
-    .select('id, session_number')
-    .eq('user_email', email)
-    .order('session_number', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (error) {
-    console.error(`Error fetching session for email: ${email}. Details:`, error);
-    throw error;
-  }
-
-  return { id: data?.id, session_number: data?.session_number };
-};
-
-export const getMessagesForSession = async (sessionId: string) => {
-  if (!sessionId) {
-    return [];
-  }
-  
-  const { data, error } = await supabase
-    .from('messages')
-    .select(`
-      id, 
-      role, 
-      content, 
-      created_at
-    `)
-    .eq('session_id', sessionId)
-    .order('created_at', { ascending: true });
-
-  if (error) {
-    console.error(`Error fetching messages for session ID: ${sessionId}. Details:`, error);
-    return [];
-  }
-
-  return data.map((message: any) => ({
-    id: message.id,
-    role: message.role,
-    content: message.content,
-    created_at: message.created_at
-  }));
-};
-
-export const insertMessage = async ({
-  sessionId,
-  role,
-  content,
-  email
-}: {
-  sessionId: string;
-  role: 'user' | 'ai' | 'system';
+export interface Memory {
+  id: string;
+  branch_id: string;
   content: string;
-  email: string
-}) => {
-  if (!email || !sessionId) {
+  created_at: string;
+  updated_at: string;
+}
+
+export const createBranch = async (title: string, userId: string): Promise<Branch | null> => {
+  console.log("Creating branch:", title, userId);
+  const { data, error } = await supabase
+    .from('branches')
+    .insert([{ title, user_id: userId }])
+    .select('*')
+    .single();
+  console.log("Branch created:", data);
+  if (error || !data) {
+    console.error('Error creating branch:', error);
     return null;
   }
+  return data;
+};
+
+export const getBranches = async (userId: string): Promise<Branch[]> => {
+  const { data, error } = await supabase
+    .from('branches')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
   
+  if (error) {
+    console.error('Error fetching branches:', error);
+    return [];
+  }
+  return data;
+};
+
+export const getBranchById = async (branchId: string): Promise<Branch | null> => {
   const { data, error } = await supabase
-    .from('messages')
-    .insert([
-      {
-        session_id: sessionId,
-        role,
-        content,
-        email,
-      },
-    ])
-    .select()
+    .from('branches')
+    .select('*')
+    .eq('id', branchId)
     .single();
 
   if (error) {
-    console.error(
-      `Error inserting message for session ID: ${sessionId}, Role: ${role}, Email: ${email}. Content: ${content}. Details:`,
-      error
-    );
+    console.error('Error fetching branch:', error);
     return null;
   }
 
   return data;
 };
 
-export const incrementSession = async (email: string) => {
-  if (!email) {
-    return null;
-  }
-
-  const { data: lastSession, error: lastSessionError } = await supabase
-    .from('sessions')
-    .select('id, session_number')
-    .eq('user_email', email)
-    .order('session_number', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (lastSessionError) {
-    console.error(`Error fetching last session for email: ${email}. Details:`, lastSessionError);
-    return null;
-  }
-
-  if (lastSession) {
-    const { error: updateError } = await supabase
-      .from('sessions')
-      .update({ finished_at: new Date().toISOString() })
-      .eq('id', lastSession.id);
-
-    if (updateError) {
-      console.error(`Error updating finished_at for session ID: ${lastSession.id}. Details:`, updateError);
-      return null;
-    }
-  }
-
-  const newSessionNumber = (lastSession?.session_number || 0) + 1;
-
+export const getMemoriesForBranch = async (branchId: string): Promise<Memory[]> => {
   const { data, error } = await supabase
-    .from('sessions')
-    .insert([
-      {
-        user_email: email,
-        session_number: newSessionNumber,
-      },
-    ])
-    .select()
+    .from('memories')
+    .select('*')
+    .eq('branch_id', branchId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching memories:', error);
+    return [];
+  }
+
+  return data;
+};
+
+export const createMemory = async (branchId: string, content: string): Promise<Memory | null> => {
+  const { data, error } = await supabase
+    .from('memories')
+    .insert([{ branch_id: branchId, content }])
+    .select('*')
     .single();
 
   if (error) {
-    console.error(`Error creating new session for email: ${email}. New Session Number: ${newSessionNumber}. Details:`, error);
+    console.error('Error creating memory:', error);
     return null;
   }
 
   return data;
 };
 
-export const getSessionHistory = async (email: string) => {
-  if (!email) {
-    return [];
-  }
-
+export const updateMemory = async (memoryId: string, content: string): Promise<Memory | null> => {
   const { data, error } = await supabase
-    .from('sessions')
-    .select('id, session_number, created_at, finished_at')
-    .eq('user_email', email)
-    .order('session_number', { ascending: true });
-
-  if (error) {
-    console.error(`Error fetching session history for email: ${email}. Details:`, error);
-    return [];
-  }
-
-  return data.map((session: any) => ({
-    session_id: session.id,
-    session_number: session.session_number,
-    created_at: session.created_at,
-    finished_at: session.finished_at,
-  }));
-};
-
-export const fetchUserSessionsAndMessages = async (
-  email: string
-): Promise<UserSessionsAndMessages | null> => {
-  if (!email) {
-    return null;
-  }
-
-
-  const sessionHistory = await getSessionHistory(email);
-
-  if (!sessionHistory.length) {
-    console.error(`No sessions found for user with email: ${email}`);
-    return null;
-  }
-
-  const latestSession = sessionHistory[sessionHistory.length - 1];
-  const messages = await getMessagesForSession(latestSession.session_id);
-
-  return {
-    sessionHistory,
-    latestMessages: messages,
-  };
-};
-
-export type UserSessionsAndMessages = {
-  sessionHistory: {
-    session_id: string;
-    session_number: number;
-    created_at: string;
-  }[];
-  latestMessages: {
-    id: string;
-    role: string;
-    content: string;
-    created_at: string;
-  }[];
-};
-
-export const getLatestMessage = async (
-  sessionId: string,
-  role: string = 'ai'
-): Promise<{ content: string | null }> => {
-  if (!sessionId) {
-    return { content: null };
-  }
-
-  const { data, error } = await supabase
-    .from('messages')
-    .select('content')
-    .eq('session_id', sessionId)
-    .eq('role', role)
-    .order('created_at', { ascending: false })
-    .limit(1)
+    .from('memories')
+    .update({ 
+      content,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', memoryId)
+    .select('*')
     .single();
 
   if (error) {
-    console.error(`Error fetching latest message for session ID: ${sessionId} and role: ${role}. Details:`, error);
-    return { content: null };
+    console.error('Error updating memory:', error);
+    return null;
   }
 
-  return { content: data?.content || null };
+  return data;
+};
+
+export const deleteMemory = async (memoryId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('memories')
+    .delete()
+    .eq('id', memoryId);
+
+  if (error) {
+    console.error('Error deleting memory:', error);
+    return false;
+  }
+
+  return true;
+};
+
+export const deleteBranch = async (branchId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('branches')
+    .delete()
+    .eq('id', branchId);
+
+  if (error) {
+    console.error('Error deleting branch:', error);
+    return false;
+  }
+
+  return true;
 };
