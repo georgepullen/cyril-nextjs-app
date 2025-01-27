@@ -28,21 +28,6 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
     } else if (e.key === 'Escape') {
       // Pass through Escape key
       onKeyDown(e);
-    } else if (e.key === 'i' && e.ctrlKey && e.shiftKey) {
-      // Ctrl+Shift+I for image insertion
-      e.preventDefault();
-      const imageButton = document.querySelector('[data-image-button]') as HTMLButtonElement;
-      if (imageButton) {
-        // Store current cursor position before clicking
-        const start = e.currentTarget.selectionStart;
-        const end = e.currentTarget.selectionEnd;
-        imageButton.click();
-        // Restore cursor position after click
-        setTimeout(() => {
-          e.currentTarget.focus();
-          e.currentTarget.setSelectionRange(start, end);
-        }, 0);
-      }
     }
   };
 

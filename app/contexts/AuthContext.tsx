@@ -1,5 +1,5 @@
 "use client"
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { supabase } from "../utils/supabaseClient";
 
 interface AuthContextType {
@@ -7,6 +7,7 @@ interface AuthContextType {
   email: string | null;
   signInWithOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -14,13 +15,22 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<any | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const initialized = useRef(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
     const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setSession(session);
-        setEmail(session.user?.email || null);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setSession(session);
+          setEmail(session.user?.email || null);
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -29,6 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setEmail(session?.user?.email || null);
+      setIsLoading(false);
     });
 
     return () => {
@@ -50,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, email, signInWithOtp, verifyOtp }}>
+    <AuthContext.Provider value={{ session, email, signInWithOtp, verifyOtp, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

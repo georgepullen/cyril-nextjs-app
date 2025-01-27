@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Memory, createMemory, updateMemory, deleteMemory } from '../../utils/supabaseUtils';
 import MemoryEditor from './MemoryEditor';
 import MemoryCard from './MemoryCard';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Plus, X, ArrowLeft } from 'lucide-react';
-import KeyboardKey from './KeyboardKey';
+import debounce from 'lodash/debounce';
 
 interface MemoryListProps {
   memories: Memory[];
@@ -30,6 +30,74 @@ const MemoryList: React.FC<MemoryListProps> = ({
   const [isAddingMemory, setIsAddingMemory] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'error' | null>(null);
+
+  // Debounced auto-save function for editing existing memories
+  const debouncedSave = useCallback(
+    debounce(async (memoryId: string, content: string) => {
+      if (!content.trim()) return;
+      
+      setAutoSaveStatus('saving');
+      try {
+        const updatedMemory = await updateMemory(memoryId, content.trim());
+        if (updatedMemory) {
+          onMemoryUpdated(updatedMemory);
+          setAutoSaveStatus('saved');
+        } else {
+          setAutoSaveStatus('error');
+        }
+      } catch (error) {
+        console.error('Auto-save error:', error);
+        setAutoSaveStatus('error');
+      }
+    }, 1000),
+    [onMemoryUpdated]
+  );
+
+  // Save immediately without debounce
+  const saveImmediately = async (memoryId: string, content: string) => {
+    if (!content.trim()) return;
+    
+    setAutoSaveStatus('saving');
+    try {
+      const updatedMemory = await updateMemory(memoryId, content.trim());
+      if (updatedMemory) {
+        onMemoryUpdated(updatedMemory);
+        setAutoSaveStatus('saved');
+      } else {
+        setAutoSaveStatus('error');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setAutoSaveStatus('error');
+    }
+  };
+
+  // Handle content changes during editing
+  const handleEditChange = (content: string) => {
+    setEditContent(content);
+    if (editingId) {
+      debouncedSave(editingId, content);
+    }
+  };
+
+  // Cancel editing and cleanup
+  const cancelEditing = async () => {
+    if (editingId && editContent.trim()) {
+      debouncedSave.cancel(); // Cancel any pending debounced saves
+      await saveImmediately(editingId, editContent);
+    }
+    setEditingId(null);
+    setEditContent('');
+    setAutoSaveStatus(null);
+  };
+
+  // Start editing a memory
+  const startEditing = (memory: Memory) => {
+    setEditingId(memory.id);
+    setEditContent(memory.content);
+    setAutoSaveStatus(null);
+  };
 
   const handleAddMemory = async () => {
     if (!newMemory.trim()) return;
@@ -48,48 +116,15 @@ const MemoryList: React.FC<MemoryListProps> = ({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.shiftKey) {
-      e.preventDefault();
+  const handleKeyPress = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
       if (editingId) {
-        handleSaveEdit();
-      } else {
-        handleAddMemory();
-      }
-    } else if (e.key === 'Escape') {
-      if (editingId) {
-        cancelEditing();
+        await cancelEditing();
       } else {
         setIsAddingMemory(false);
         setNewMemory('');
       }
     }
-  };
-
-  const startEditing = (memory: Memory) => {
-    setEditingId(memory.id);
-    setEditContent(memory.content);
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingId || !editContent.trim()) return;
-    
-    setIsLoading(true);
-    try {
-      const updatedMemory = await updateMemory(editingId, editContent.trim());
-      if (updatedMemory) {
-        onMemoryUpdated(updatedMemory);
-      }
-    } finally {
-      setIsLoading(false);
-      setEditingId(null);
-      setEditContent('');
-    }
-  };
-
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditContent('');
   };
 
   const handleMemorySelect = (index: number) => {
@@ -264,24 +299,6 @@ const MemoryList: React.FC<MemoryListProps> = ({
                 </button>
               </div>
             </div>
-            {/* Add Shortcuts Bar */}
-            <div className="h-8 bg-[#161622] border-b border-[#b35cff]/20 
-                          flex items-center px-6 flex-shrink-0">
-              <div className="flex items-center space-x-8">
-                <div className="flex items-center space-x-2 text-gray-500 text-xs">
-                  <div className="flex items-center space-x-1">
-                    <KeyboardKey>SHIFT</KeyboardKey>
-                    <span>+</span>
-                    <KeyboardKey>ENTER</KeyboardKey>
-                  </div>
-                  <span>save</span>
-                </div>
-                <div className="flex items-center space-x-2 text-gray-500 text-xs">
-                  <KeyboardKey>ESC</KeyboardKey>
-                  <span>cancel</span>
-                </div>
-              </div>
-            </div>
             <div className="flex-1 overflow-hidden p-6">
               <div className="h-full">
                 <MemoryEditor
@@ -298,13 +315,12 @@ const MemoryList: React.FC<MemoryListProps> = ({
             memory={memories[currentIndex]}
             isEditing={editingId === memories[currentIndex].id}
             editContent={editContent}
-            isLoading={isLoading}
             onEdit={() => startEditing(memories[currentIndex])}
-            onEditChange={setEditContent}
-            onSave={handleSaveEdit}
+            onEditChange={handleEditChange}
             onCancel={cancelEditing}
             onKeyDown={handleKeyPress}
             onToggleSidebar={() => setIsSidebarOpen(true)}
+            autoSaveStatus={autoSaveStatus}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center p-6">

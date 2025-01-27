@@ -13,24 +13,24 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
   const [branch, setBranch] = useState<Branch | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { session } = useAuth();
+  const { session, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const user = session?.user;
 
   useEffect(() => {
     const loadData = async () => {
-      if (user) {
-        setIsLoading(true);
-        try {
-          const [branchData, memoriesData] = await Promise.all([
-            getBranchById(params.id),
-            getMemoriesForBranch(params.id)
-          ]);
-          setBranch(branchData);
-          setMemories(memoriesData);
-        } finally {
-          setIsLoading(false);
-        }
+      if (!user) return;
+      
+      setIsLoading(true);
+      try {
+        const [branchData, memoriesData] = await Promise.all([
+          getBranchById(params.id),
+          getMemoriesForBranch(params.id)
+        ]);
+        setBranch(branchData);
+        setMemories(memoriesData);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -38,14 +38,10 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
   }, [params.id, user]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!session) {
-        router.push('/auth');
-      }
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [session, router]);
+    if (!isAuthLoading && !session) {
+      router.push('/auth');
+    }
+  }, [session, router, isAuthLoading]);
 
   const handleMemoryAdded = (newMemory: Memory) => {
     setMemories([newMemory, ...memories]);
@@ -61,7 +57,7 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
     setMemories(memories.filter(memory => memory.id !== deletedMemoryId));
   };
 
-  if (!session) {
+  if (isAuthLoading) {
     return (
       <main className="min-h-screen bg-[#0D0D15] text-white font-mono flex items-center justify-center">
         <div className="text-center">
@@ -70,6 +66,10 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
         </div>
       </main>
     );
+  }
+
+  if (!session) {
+    return null; // Let the useEffect redirect handle this
   }
 
   return (

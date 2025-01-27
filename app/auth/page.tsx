@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Mail, Key, ArrowRight, Loader2 } from 'lucide-react';
@@ -15,7 +15,13 @@ const Access: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const controls = useAnimation();
-  const { signInWithOtp, verifyOtp } = useAuth();
+  const { signInWithOtp, verifyOtp, session, isLoading: isAuthLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthLoading && session) {
+      router.push('/journal');
+    }
+  }, [session, router, isAuthLoading]);
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();

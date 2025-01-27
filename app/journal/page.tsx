@@ -20,7 +20,7 @@ interface GroupedBranches {
 export default function JournalPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { session } = useAuth();
+  const { session, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const user = session?.user;
   const [isAddingBranch, setIsAddingBranch] = useState(false);
@@ -30,8 +30,9 @@ export default function JournalPage() {
   const MAX_BRANCH_TITLE_LENGTH = 25;
 
   const loadBranches = useCallback(async () => {
+    if (!user) return;
     try {
-      const fetchedBranches = await getBranches(user!.id);
+      const fetchedBranches = await getBranches(user.id);
       setBranches(fetchedBranches);
     } finally {
       setIsLoading(false);
@@ -39,20 +40,14 @@ export default function JournalPage() {
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      loadBranches();
-    }
-  }, [user, loadBranches]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
+    if (!isAuthLoading) {
       if (!session) {
         router.push('/auth');
+      } else if (user) {
+        loadBranches();
       }
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [session, router]);
+    }
+  }, [session, user, router, isAuthLoading, loadBranches]);
 
   const handleBranchAdded = (newBranch: Branch) => {
     setBranches([newBranch, ...branches]);
@@ -269,7 +264,7 @@ export default function JournalPage() {
     return 'text-gray-400';
   };
 
-  if (!session) {
+  if (isAuthLoading) {
     return (
       <main className="min-h-screen bg-[#0D0D15] text-white font-mono flex items-center justify-center">
         <div className="text-center">
@@ -278,6 +273,10 @@ export default function JournalPage() {
         </div>
       </main>
     );
+  }
+
+  if (!session) {
+    return null; // Let the useEffect redirect handle this
   }
 
   return (

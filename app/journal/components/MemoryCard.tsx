@@ -4,34 +4,67 @@ import { formatDistanceToNow } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import MemoryEditor from './MemoryEditor';
-import { Edit2, Save, X, Menu } from 'lucide-react';
-import KeyboardKey from './KeyboardKey';
+import { Edit2, X, Menu, Check, AlertCircle } from 'lucide-react';
 
 interface MemoryCardProps {
   memory: Memory;
   isEditing: boolean;
   editContent: string;
-  isLoading: boolean;
   onEdit: () => void;
   onEditChange: (content: string) => void;
-  onSave: () => void;
   onCancel: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   onToggleSidebar?: () => void;
+  autoSaveStatus?: 'saved' | 'saving' | 'error' | null;
 }
 
 const MemoryCard: React.FC<MemoryCardProps> = ({
   memory,
   isEditing,
   editContent,
-  isLoading,
   onEdit,
   onEditChange,
-  onSave,
   onCancel,
   onKeyDown,
   onToggleSidebar,
+  autoSaveStatus
 }) => {
+  const renderAutoSaveStatus = () => {
+    if (!isEditing) return null;
+
+    const statusConfig = {
+      saving: {
+        text: 'Saving changes...',
+        className: 'text-gray-400',
+        icon: null
+      },
+      saved: {
+        text: 'All changes saved',
+        className: 'text-green-400',
+        icon: <Check className="w-4 h-4" />
+      },
+      error: {
+        text: 'Error saving changes',
+        className: 'text-red-400',
+        icon: <AlertCircle className="w-4 h-4" />
+      },
+      null: {
+        text: 'Changes save automatically',
+        className: 'text-gray-400',
+        icon: null
+      }
+    };
+
+    const config = statusConfig[autoSaveStatus || 'null'];
+
+    return (
+      <div className={`flex items-center gap-1.5 text-xs ${config.className}`}>
+        {config.icon}
+        <span>{config.text}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
@@ -41,34 +74,20 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
           <span className="text-lg font-medium bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent">
             {isEditing ? 'Editing Memory' : 'Memory'}
           </span>
+          {renderAutoSaveStatus()}
         </div>
         <div className="flex items-center space-x-4">
           {isEditing ? (
-            <>
-              <button
-                onClick={onCancel}
-                className="p-2 text-gray-400 hover:text-gray-300 
-                          hover:bg-gray-500/10 rounded-lg transition-colors duration-200
-                          focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50"
-                title="Cancel (Esc)"
-                aria-label="Cancel editing"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <button
-                onClick={onSave}
-                disabled={isLoading || !editContent.trim()}
-                className={`p-2 rounded-lg transition-all duration-200
-                          focus:outline-none focus:ring-2 
-                          ${isLoading || !editContent.trim()
-                            ? 'text-[#b35cff]/50 cursor-not-allowed'
-                            : 'text-[#b35cff] hover:bg-[#b35cff]/10 focus:ring-[#b35cff]/50'}`}
-                title="Save (Shift+Enter)"
-                aria-label="Save changes"
-              >
-                <Save className="w-5 h-5" />
-              </button>
-            </>
+            <button
+              onClick={onCancel}
+              className="p-2 text-gray-400 hover:text-gray-300 
+                        hover:bg-gray-500/10 rounded-lg transition-colors duration-200
+                        focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50"
+              title="Press Esc to exit"
+              aria-label="Cancel editing"
+            >
+              <X className="w-5 h-5" />
+            </button>
           ) : (
             <button
               onClick={onEdit}
@@ -82,27 +101,6 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
           )}
         </div>
       </div>
-
-      {/* Shortcuts Bar - Only show when editing */}
-      {isEditing && (
-        <div className="h-8 bg-[#161622] border-b border-[#b35cff]/20 
-                      flex items-center px-6 flex-shrink-0">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-2 text-gray-500 text-xs">
-              <div className="flex items-center space-x-1">
-                <KeyboardKey>SHIFT</KeyboardKey>
-                <span>+</span>
-                <KeyboardKey>ENTER</KeyboardKey>
-              </div>
-              <span>save</span>
-            </div>
-            <div className="flex items-center space-x-2 text-gray-500 text-xs">
-              <KeyboardKey>ESC</KeyboardKey>
-              <span>cancel</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Content */}
       <div 
