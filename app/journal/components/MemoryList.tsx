@@ -435,7 +435,7 @@ const MemoryList: React.FC<MemoryListProps> = ({
                   onChange={handleNewMemoryChange}
                   onKeyDown={handleKeyPress}
                   placeholder="Start typing your memory... (Markdown supported)"
-                  maxWords={5000}
+                  maxChars={5000}
                 />
               </div>
             </div>
