@@ -3,7 +3,6 @@ import { Loader2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import QuestionAnswerSection from './QuestionAnswerSection';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { FeedbackSettings } from './FeedbackConfig';
 
 interface QuestionsModalProps {
   isOpen: boolean;
@@ -12,7 +11,7 @@ interface QuestionsModalProps {
   questions: string | null;
   answers: string[];
   onAnswerChange: (index: number, value: string) => void;
-  onSubmitAnswers: (settings: FeedbackSettings) => void;
+  onSubmitAnswers: () => void;
   isSubmitting: boolean;
   feedback: string | null;
 }

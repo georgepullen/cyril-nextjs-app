@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Plus, X, ArrowLeft, Check, AlertCircle, Brain, Loader2 } from 'lucide-react';
 import debounce from 'lodash/debounce';
 import { generateQuestionsFromMemories, generateFeedbackForAnswers } from '../../utils/perplexityUtils';
-import { FeedbackSettings } from './FeedbackConfig';
+import FeedbackConfig, { FeedbackSettings } from './FeedbackConfig';
 
 interface MemoryListProps {
   memories: Memory[];
@@ -16,6 +16,11 @@ interface MemoryListProps {
   onMemoryAdded: (memory: Memory) => void;
   onMemoryUpdated: (memory: Memory) => void;
   onMemoryDeleted?: (memoryId: string) => void;
+  editingMemoryId: string | null;
+  editContent: string;
+  onStartEditing: (memory: Memory) => void;
+  onCancelEditing: () => void;
+  onEditChange: (content: string) => void;
 }
 
 const MemoryList: React.FC<MemoryListProps> = ({
@@ -23,11 +28,14 @@ const MemoryList: React.FC<MemoryListProps> = ({
   branchId,
   onMemoryAdded,
   onMemoryUpdated,
-  onMemoryDeleted = () => {}
+  onMemoryDeleted = () => {},
+  editingMemoryId,
+  editContent,
+  onStartEditing,
+  onCancelEditing,
+  onEditChange
 }) => {
   const [newMemory, setNewMemory] = useState('');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAddingMemory, setIsAddingMemory] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -40,6 +48,13 @@ const MemoryList: React.FC<MemoryListProps> = ({
   const [answers, setAnswers] = useState<string[]>(Array(5).fill(''));
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isSubmittingAnswers, setIsSubmittingAnswers] = useState(false);
+  const [feedbackSettings, setFeedbackSettings] = useState<FeedbackSettings>({
+    examBoard: 'General Feedback',
+    gradeLevel: 'General',
+    subjectArea: '',
+    additionalNotes: ''
+  });
+  const [isFeedbackConfigExpanded, setIsFeedbackConfigExpanded] = useState(false);
 
   // Debounced auto-save function for editing existing memories
   const debouncedSave = useCallback(
@@ -84,34 +99,39 @@ const MemoryList: React.FC<MemoryListProps> = ({
 
   // Handle content changes during editing
   const handleEditChange = (content: string) => {
-    setEditContent(content);
-    if (editingId) {
-      debouncedSave(editingId, content);
+    onEditChange(content);
+    if (editingMemoryId) {
+      debouncedSave(editingMemoryId, content);
     }
   };
 
   // Cancel editing and cleanup
   const cancelEditing = async () => {
-    if (editingId && editContent.trim()) {
+    if (editingMemoryId && editContent.trim()) {
       debouncedSave.cancel(); // Cancel any pending debounced saves
-      await saveImmediately(editingId, editContent);
+      await saveImmediately(editingMemoryId, editContent);
     }
-    setEditingId(null);
-    setEditContent('');
+    onCancelEditing();
     setAutoSaveStatus(null);
   };
 
-  // Start editing a memory
-  const startEditing = (memory: Memory) => {
-    setEditingId(memory.id);
-    setEditContent(memory.content);
-    setAutoSaveStatus(null);
+  const handleKeyPress = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      if (editingMemoryId) {
+        await cancelEditing();
+      } else {
+        setIsAddingMemory(false);
+        setNewMemory('');
+      }
+    }
   };
 
   // Debounced auto-save function for new memories
   const debouncedSaveNewMemory = useCallback(
     debounce(async (content: string) => {
-      if (!content.trim()) return;
+      // Don't save if content is just whitespace, hashtags, or other markdown formatting
+      const meaningfulContent = content.replace(/^[#\s*_-]+/, '').trim();
+      if (!meaningfulContent || meaningfulContent.length < 3) return;
       
       setNewMemoryAutoSaveStatus('saving');
       try {
@@ -129,14 +149,16 @@ const MemoryList: React.FC<MemoryListProps> = ({
         console.error('Auto-save error:', error);
         setNewMemoryAutoSaveStatus('error');
       }
-    }, 1000),
+    }, 2000), // Increased debounce time to 2 seconds for new memories
     [branchId, onMemoryAdded]
   );
 
   // Handle new memory content changes with auto-save
   const handleNewMemoryChange = (content: string) => {
     setNewMemory(content);
-    if (content.trim()) {
+    // Only trigger auto-save if there's meaningful content
+    const meaningfulContent = content.replace(/^[#\s*_-]+/, '').trim();
+    if (meaningfulContent && meaningfulContent.length >= 3) {
       debouncedSaveNewMemory(content);
     }
   };
@@ -184,17 +206,6 @@ const MemoryList: React.FC<MemoryListProps> = ({
         <span>{config.text}</span>
       </div>
     );
-  };
-
-  const handleKeyPress = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      if (editingId) {
-        await cancelEditing();
-      } else {
-        setIsAddingMemory(false);
-        setNewMemory('');
-      }
-    }
   };
 
   const handleMemorySelect = (index: number) => {
@@ -245,14 +256,13 @@ const MemoryList: React.FC<MemoryListProps> = ({
     setAnswers(newAnswers);
   };
 
-  const submitAnswers = async (settings: FeedbackSettings) => {
-    if (!generatedQuestions || !settings) return;
+  const handleSubmitAnswers = async () => {
+    if (!generatedQuestions || !feedbackSettings) return;
     
     setIsSubmittingAnswers(true);
     try {
-      console.log('Submitting answers with settings:', settings); // Add logging
-      const feedback = await generateFeedbackForAnswers(generatedQuestions, answers, settings);
-      setFeedback(feedback);
+      const feedbackResult = await generateFeedbackForAnswers(generatedQuestions, answers, feedbackSettings);
+      setFeedback(feedbackResult);
     } catch (error) {
       console.error('Error submitting answers:', error);
       setFeedback('Error processing your answers. Please try again.');
@@ -384,6 +394,16 @@ const MemoryList: React.FC<MemoryListProps> = ({
           </div>
         </div>
 
+        {/* Feedback Preferences */}
+        <div className="p-3 border-t border-[#b35cff]/20">
+          <FeedbackConfig
+            settings={feedbackSettings}
+            onSettingsChange={setFeedbackSettings}
+            isExpanded={isFeedbackConfigExpanded}
+            onToggleExpand={() => setIsFeedbackConfigExpanded(!isFeedbackConfigExpanded)}
+          />
+        </div>
+
         {/* Mobile Close Button */}
         <div className="md:hidden border-t border-[#b35cff]/20">
           <button 
@@ -436,6 +456,7 @@ const MemoryList: React.FC<MemoryListProps> = ({
                   onKeyDown={handleKeyPress}
                   placeholder="Start typing your memory... (Markdown supported)"
                   maxChars={5000}
+                  autoFocus={true}
                 />
               </div>
             </div>
@@ -443,9 +464,9 @@ const MemoryList: React.FC<MemoryListProps> = ({
         ) : memories.length > 0 ? (
           <MemoryCard
             memory={memories[currentIndex]}
-            isEditing={editingId === memories[currentIndex].id}
+            isEditing={editingMemoryId === memories[currentIndex].id}
             editContent={editContent}
-            onEdit={() => startEditing(memories[currentIndex])}
+            onEdit={() => onStartEditing(memories[currentIndex])}
             onEditChange={handleEditChange}
             onCancel={cancelEditing}
             onKeyDown={handleKeyPress}
@@ -524,7 +545,7 @@ const MemoryList: React.FC<MemoryListProps> = ({
         questions={generatedQuestions}
         answers={answers}
         onAnswerChange={handleAnswerChange}
-        onSubmitAnswers={submitAnswers}
+        onSubmitAnswers={handleSubmitAnswers}
         isSubmitting={isSubmittingAnswers}
         feedback={feedback}
       />

@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,13 +13,16 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
   const [branch, setBranch] = useState<Branch | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingMemoryId, setEditingMemoryId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
   const { session, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const user = session?.user;
+  const loadedRef = useRef(false);
 
   useEffect(() => {
     const loadData = async () => {
-      if (!user) return;
+      if (!user || loadedRef.current) return;
       
       setIsLoading(true);
       try {
@@ -29,6 +32,7 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
         ]);
         setBranch(branchData);
         setMemories(memoriesData);
+        loadedRef.current = true;
       } finally {
         setIsLoading(false);
       }
@@ -43,19 +47,37 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
     }
   }, [session, router, isAuthLoading]);
 
-  const handleMemoryAdded = (newMemory: Memory) => {
-    setMemories([newMemory, ...memories]);
-  };
+  const handleMemoryAdded = useCallback((newMemory: Memory) => {
+    setMemories(prev => [newMemory, ...prev]);
+  }, []);
 
-  const handleMemoryUpdated = (updatedMemory: Memory) => {
-    setMemories(memories.map(memory => 
+  const handleMemoryUpdated = useCallback((updatedMemory: Memory) => {
+    setMemories(prev => prev.map(memory => 
       memory.id === updatedMemory.id ? updatedMemory : memory
     ));
-  };
+  }, []);
 
-  const handleMemoryDeleted = (deletedMemoryId: string) => {
-    setMemories(memories.filter(memory => memory.id !== deletedMemoryId));
-  };
+  const handleMemoryDeleted = useCallback((deletedMemoryId: string) => {
+    setMemories(prev => prev.filter(memory => memory.id !== deletedMemoryId));
+    if (editingMemoryId === deletedMemoryId) {
+      setEditingMemoryId(null);
+      setEditContent('');
+    }
+  }, [editingMemoryId]);
+
+  const handleStartEditing = useCallback((memory: Memory) => {
+    setEditingMemoryId(memory.id);
+    setEditContent(memory.content);
+  }, []);
+
+  const handleCancelEditing = useCallback(() => {
+    setEditingMemoryId(null);
+    setEditContent('');
+  }, []);
+
+  const handleEditChange = useCallback((content: string) => {
+    setEditContent(content);
+  }, []);
 
   if (isAuthLoading) {
     return (
@@ -129,6 +151,11 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
               onMemoryAdded={handleMemoryAdded}
               onMemoryUpdated={handleMemoryUpdated}
               onMemoryDeleted={handleMemoryDeleted}
+              editingMemoryId={editingMemoryId}
+              editContent={editContent}
+              onStartEditing={handleStartEditing}
+              onCancelEditing={handleCancelEditing}
+              onEditChange={handleEditChange}
             />
           </div>
         ) : (
