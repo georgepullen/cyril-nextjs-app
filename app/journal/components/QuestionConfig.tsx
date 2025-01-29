@@ -48,20 +48,24 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
   };
 
   const handleQuestionCountChange = (count: number) => {
+    const limits = getQuestionCountLimits();
+    // Clamp the count between min and max limits
+    const validCount = Math.min(Math.max(count, limits.min), limits.max);
+    
     const newConfig = { ...config };
-    newConfig.questionCount = count;
+    newConfig.questionCount = validCount;
 
     // Adjust marks array based on new count
-    if (count > newConfig.marks.perQuestion.length) {
+    if (validCount > newConfig.marks.perQuestion.length) {
       // Add new marks with default values
       const defaultMark = config.type === 'single-long' ? 20 : config.type === 'medium' ? 8 : 3;
       newConfig.marks.perQuestion = [
         ...newConfig.marks.perQuestion,
-        ...Array(count - newConfig.marks.perQuestion.length).fill(defaultMark)
+        ...Array(validCount - newConfig.marks.perQuestion.length).fill(defaultMark)
       ];
     } else {
       // Remove excess marks
-      newConfig.marks.perQuestion = newConfig.marks.perQuestion.slice(0, count);
+      newConfig.marks.perQuestion = newConfig.marks.perQuestion.slice(0, validCount);
     }
 
     onConfigChange(newConfig);
@@ -145,13 +149,24 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
                   min={getQuestionCountLimits().min}
                   max={getQuestionCountLimits().max}
                   value={config.questionCount}
-                  onChange={(e) => handleQuestionCountChange(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value)) {
+                      handleQuestionCountChange(value);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value)) {
+                      handleQuestionCountChange(value);
+                    }
+                  }}
                   className="w-20 bg-[#1E1E2E] text-white border border-[#b35cff]/20 
                            rounded-lg px-3 py-2 text-sm
                            focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50"
                 />
                 <span className="text-xs text-gray-400">
-                  (max {getQuestionCountLimits().max})
+                  (min {getQuestionCountLimits().min}, max {getQuestionCountLimits().max})
                 </span>
               </div>
             </div>
