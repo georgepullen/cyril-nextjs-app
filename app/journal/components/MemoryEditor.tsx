@@ -7,7 +7,7 @@ interface MemoryEditorProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   placeholder?: string;
   autoFocus?: boolean;
-  maxWords?: number;
+  maxChars?: number;
 }
 
 const MemoryEditor: React.FC<MemoryEditorProps> = ({
@@ -16,14 +16,9 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
   onKeyDown,
   placeholder = "Add a new memory... (Markdown supported)",
   autoFocus = false,
-  maxWords = 5000,
+  maxChars = 5000,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const getWordCount = (text: string): number => {
-    // Split by whitespace and filter out empty strings
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
-  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Escape') {
@@ -49,7 +44,7 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
-    if (getWordCount(newContent) <= maxWords) {
+    if (newContent.length <= maxChars) {
       onChange(newContent);
     }
   };
@@ -62,7 +57,7 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
     const end = textarea.selectionEnd;
     const newContent = content.substring(0, start) + markdown + content.substring(end);
     
-    if (getWordCount(newContent) <= maxWords) {
+    if (newContent.length <= maxChars) {
       onChange(newContent);
       // Set cursor position after the inserted markdown
       setTimeout(() => {
@@ -73,10 +68,10 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
     }
   };
 
-  const getWordCountColor = () => {
-    const remaining = maxWords - getWordCount(content);
-    if (remaining <= 100) return 'text-red-400';
-    if (remaining <= 500) return 'text-yellow-400';
+  const getCharCountColor = () => {
+    const remaining = maxChars - content.length;
+    if (remaining <= 200) return 'text-red-400';
+    if (remaining <= 1000) return 'text-yellow-400';
     return 'text-gray-400';
   };
 
@@ -95,7 +90,8 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
                     disabled:opacity-50 disabled:cursor-not-allowed"
           autoFocus={autoFocus}
           aria-label="Memory content"
-          aria-describedby="word-count"
+          aria-describedby="char-count"
+          maxLength={maxChars}
         />
         <div className="absolute bottom-2 right-2">
           <ImageInserter onInsert={handleImageInsert} />
@@ -103,12 +99,12 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
       </div>
       <div className="flex justify-end mt-2">
         <span 
-          id="word-count"
-          className={`text-xs ${getWordCountColor()} transition-colors duration-200`}
+          id="char-count"
+          className={`text-xs ${getCharCountColor()} transition-colors duration-200`}
           role="status"
           aria-live="polite"
         >
-          {getWordCount(content)}/{maxWords} words
+          {content.length}/{maxChars} characters
         </span>
       </div>
     </div>
