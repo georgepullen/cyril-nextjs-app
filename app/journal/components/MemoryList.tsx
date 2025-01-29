@@ -457,7 +457,7 @@ const MemoryList: React.FC<MemoryListProps> = ({
                   onKeyDown={handleKeyPress}
                   placeholder="Start typing your memory... (Markdown supported)"
                   autoFocus={true}
-                  maxChars={20000}
+                  maxChars={10000}
                 />
               </div>
             </div>

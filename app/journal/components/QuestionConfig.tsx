@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, ChevronDown } from 'lucide-react';
+import { Settings, ChevronDown, AlertCircle } from 'lucide-react';
 
 export interface QuestionConfig {
   type: 'single-long' | 'medium' | 'short';
@@ -15,6 +15,12 @@ interface QuestionConfigProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
 }
+
+const MAX_TOTAL_MARKS = {
+  'single-long': 30,
+  'medium': 40,
+  'short': 25
+};
 
 const QuestionConfig: React.FC<QuestionConfigProps> = ({
   config,
@@ -57,11 +63,16 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
 
     // Adjust marks array based on new count
     if (validCount > newConfig.marks.perQuestion.length) {
-      // Add new marks with default values
+      // Add new marks with default values that don't exceed max total
+      const currentTotal = getTotalMarks();
       const defaultMark = config.type === 'single-long' ? 20 : config.type === 'medium' ? 8 : 3;
+      const remainingMarks = MAX_TOTAL_MARKS[config.type] - currentTotal;
+      const marksToAdd = validCount - newConfig.marks.perQuestion.length;
+      const markPerNewQuestion = Math.min(defaultMark, Math.floor(remainingMarks / marksToAdd));
+      
       newConfig.marks.perQuestion = [
         ...newConfig.marks.perQuestion,
-        ...Array(validCount - newConfig.marks.perQuestion.length).fill(defaultMark)
+        ...Array(marksToAdd).fill(markPerNewQuestion)
       ];
     } else {
       // Remove excess marks
@@ -73,7 +84,18 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
 
   const handleMarkChange = (index: number, value: number) => {
     const newConfig = { ...config };
-    newConfig.marks.perQuestion[index] = value;
+    const oldValue = newConfig.marks.perQuestion[index];
+    const otherMarksTotal = getTotalMarks() - oldValue;
+    const maxAllowedForThisQuestion = MAX_TOTAL_MARKS[config.type] - otherMarksTotal;
+    
+    // Clamp the value between mark limits and remaining allowed marks
+    const marksLimits = getMarksLimits();
+    const clampedValue = Math.min(
+      Math.max(value, marksLimits.min),
+      Math.min(marksLimits.max, maxAllowedForThisQuestion)
+    );
+    
+    newConfig.marks.perQuestion[index] = clampedValue;
     onConfigChange(newConfig);
   };
 
@@ -103,6 +125,10 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
     }
   };
 
+  const getRemainingMarks = () => {
+    return MAX_TOTAL_MARKS[config.type] - getTotalMarks();
+  };
+
   return (
     <div className="bg-[#161622] border border-[#b35cff]/20 rounded-lg overflow-hidden">
       <button
@@ -116,7 +142,7 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-400">
-            {getTotalMarks()} marks total
+            {getTotalMarks()}/{MAX_TOTAL_MARKS[config.type]} marks total
           </span>
           <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200
                                 ${isExpanded ? 'rotate-180' : ''}`} />
@@ -173,7 +199,12 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
           )}
 
           <div className="space-y-2">
-            <label className="text-xs text-gray-400">Marks per Question</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-400">Marks per Question</label>
+              <span className="text-xs text-gray-400">
+                Remaining: {getRemainingMarks()} marks
+              </span>
+            </div>
             <div className="space-y-2">
               {config.marks.perQuestion.map((marks, index) => (
                 <div key={index} className="flex items-center gap-2">
@@ -183,7 +214,7 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
                   <input
                     type="number"
                     min={getMarksLimits().min}
-                    max={getMarksLimits().max}
+                    max={Math.min(getMarksLimits().max, getRemainingMarks() + marks)}
                     value={marks}
                     onChange={(e) => handleMarkChange(index, parseInt(e.target.value))}
                     className="w-20 bg-[#1E1E2E] text-white border border-[#b35cff]/20 
@@ -191,12 +222,19 @@ const QuestionConfig: React.FC<QuestionConfigProps> = ({
                              focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50"
                   />
                   <span className="text-xs text-gray-400">
-                    marks (max {getMarksLimits().max})
+                    marks (max {Math.min(getMarksLimits().max, getRemainingMarks() + marks)})
                   </span>
                 </div>
               ))}
             </div>
           </div>
+
+          {getTotalMarks() > MAX_TOTAL_MARKS[config.type] && (
+            <div className="flex items-center gap-2 text-red-400 text-xs">
+              <AlertCircle className="w-4 h-4" />
+              <span>Total marks exceed the maximum of {MAX_TOTAL_MARKS[config.type]}</span>
+            </div>
+          )}
         </div>
       )}
     </div>

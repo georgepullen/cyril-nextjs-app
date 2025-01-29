@@ -147,7 +147,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
               onChange={onEditChange}
               onKeyDown={onKeyDown}
               autoFocus
-              maxChars={5000}
+              maxChars={10000}
             />
           </div>
         ) : (
@@ -172,7 +172,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
           </span>
           {!isEditing && (
             <span className="text-sm text-gray-400">
-              {memory.content.length}/20000 characters
+              {memory.content.length}/10000 characters
             </span>
           )}
         </div>
