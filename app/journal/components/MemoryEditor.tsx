@@ -7,7 +7,7 @@ interface MemoryEditorProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   placeholder?: string;
   autoFocus?: boolean;
-  maxLength?: number;
+  maxWords?: number;
 }
 
 const MemoryEditor: React.FC<MemoryEditorProps> = ({
@@ -16,24 +16,40 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
   onKeyDown,
   placeholder = "Add a new memory... (Markdown supported)",
   autoFocus = false,
-  maxLength = 500,
+  maxWords = 5000,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const getWordCount = (text: string): number => {
+    // Split by whitespace and filter out empty strings
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && e.shiftKey) {
-      // Submit on Shift+Enter
-      e.preventDefault();
-      onKeyDown(e);
-    } else if (e.key === 'Escape') {
+    if (e.key === 'Escape') {
       // Pass through Escape key
       onKeyDown(e);
+    } else if (e.key === 'i' && e.ctrlKey && e.shiftKey) {
+      // Ctrl+Shift+I for image insertion
+      e.preventDefault();
+      const imageButton = document.querySelector('[data-image-button]') as HTMLButtonElement;
+      if (imageButton) {
+        // Store current cursor position before clicking
+        const start = e.currentTarget.selectionStart;
+        const end = e.currentTarget.selectionEnd;
+        imageButton.click();
+        // Restore cursor position after click
+        setTimeout(() => {
+          e.currentTarget.focus();
+          e.currentTarget.setSelectionRange(start, end);
+        }, 0);
+      }
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
-    if (newContent.length <= maxLength) {
+    if (getWordCount(newContent) <= maxWords) {
       onChange(newContent);
     }
   };
@@ -46,7 +62,7 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
     const end = textarea.selectionEnd;
     const newContent = content.substring(0, start) + markdown + content.substring(end);
     
-    if (newContent.length <= maxLength) {
+    if (getWordCount(newContent) <= maxWords) {
       onChange(newContent);
       // Set cursor position after the inserted markdown
       setTimeout(() => {
@@ -57,10 +73,10 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
     }
   };
 
-  const getCharacterCountColor = () => {
-    const remaining = maxLength - content.length;
-    if (remaining <= 50) return 'text-red-400';
-    if (remaining <= 100) return 'text-yellow-400';
+  const getWordCountColor = () => {
+    const remaining = maxWords - getWordCount(content);
+    if (remaining <= 100) return 'text-red-400';
+    if (remaining <= 500) return 'text-yellow-400';
     return 'text-gray-400';
   };
 
@@ -73,14 +89,13 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          maxLength={maxLength}
           className="w-full h-full bg-transparent text-white p-2 rounded-lg
                     focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50
                     placeholder-gray-400 resize-none font-mono
                     disabled:opacity-50 disabled:cursor-not-allowed"
           autoFocus={autoFocus}
           aria-label="Memory content"
-          aria-describedby="character-count"
+          aria-describedby="word-count"
         />
         <div className="absolute bottom-2 right-2">
           <ImageInserter onInsert={handleImageInsert} />
@@ -88,12 +103,12 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
       </div>
       <div className="flex justify-end mt-2">
         <span 
-          id="character-count"
-          className={`text-xs ${getCharacterCountColor()} transition-colors duration-200`}
+          id="word-count"
+          className={`text-xs ${getWordCountColor()} transition-colors duration-200`}
           role="status"
           aria-live="polite"
         >
-          {content.length}/{maxLength} characters
+          {getWordCount(content)}/{maxWords} words
         </span>
       </div>
     </div>
