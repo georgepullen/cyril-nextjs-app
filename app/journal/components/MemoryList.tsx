@@ -2,10 +2,13 @@ import React, { useState, useCallback } from 'react';
 import { Memory, createMemory, updateMemory, deleteMemory } from '../../utils/supabaseUtils';
 import MemoryEditor from './MemoryEditor';
 import MemoryCard from './MemoryCard';
+import QuestionsModal from './QuestionsModal';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Plus, X, ArrowLeft, Check, AlertCircle } from 'lucide-react';
+import { Plus, X, ArrowLeft, Check, AlertCircle, Brain, Loader2 } from 'lucide-react';
 import debounce from 'lodash/debounce';
+import { generateQuestionsFromMemories, generateFeedbackForAnswers } from '../../utils/perplexityUtils';
+import { FeedbackSettings } from './FeedbackConfig';
 
 interface MemoryListProps {
   memories: Memory[];
@@ -31,6 +34,12 @@ const MemoryList: React.FC<MemoryListProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'error' | null>(null);
   const [newMemoryAutoSaveStatus, setNewMemoryAutoSaveStatus] = useState<'saved' | 'saving' | 'error' | null>(null);
+  const [showQuestionsModal, setShowQuestionsModal] = useState(false);
+  const [generatedQuestions, setGeneratedQuestions] = useState<string | null>(null);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [answers, setAnswers] = useState<string[]>(Array(5).fill(''));
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [isSubmittingAnswers, setIsSubmittingAnswers] = useState(false);
 
   // Debounced auto-save function for editing existing memories
   const debouncedSave = useCallback(
@@ -210,6 +219,55 @@ const MemoryList: React.FC<MemoryListProps> = ({
     }
   };
 
+  const generateQuestions = async () => {
+    setIsGeneratingQuestions(true);
+    setShowQuestionsModal(true);
+    
+    try {
+      // Concatenate all memories into a single string
+      const allMemoriesText = memories
+        .map(memory => memory.content)
+        .join('\n\n');
+
+      const questions = await generateQuestionsFromMemories(allMemoriesText);
+      setGeneratedQuestions(questions);
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      setGeneratedQuestions('Error generating questions. Please try again.');
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
+  };
+
+  const handleAnswerChange = (index: number, value: string) => {
+    const newAnswers = [...answers];
+    newAnswers[index] = value;
+    setAnswers(newAnswers);
+  };
+
+  const submitAnswers = async (settings: FeedbackSettings) => {
+    if (!generatedQuestions || !settings) return;
+    
+    setIsSubmittingAnswers(true);
+    try {
+      console.log('Submitting answers with settings:', settings); // Add logging
+      const feedback = await generateFeedbackForAnswers(generatedQuestions, answers, settings);
+      setFeedback(feedback);
+    } catch (error) {
+      console.error('Error submitting answers:', error);
+      setFeedback('Error processing your answers. Please try again.');
+    } finally {
+      setIsSubmittingAnswers(false);
+    }
+  };
+
+  const resetQuestionsAndAnswers = () => {
+    setShowQuestionsModal(false);
+    setGeneratedQuestions(null);
+    setAnswers(Array(5).fill(''));
+    setFeedback(null);
+  };
+
   return (
     <div className="h-full flex md:flex-row relative">
       {/* Sidebar */}
@@ -222,7 +280,7 @@ const MemoryList: React.FC<MemoryListProps> = ({
         md:h-full h-[calc(100vh-48px)] md:top-0 top-12
       `}>
         {/* Sidebar Header */}
-        <div className="p-3 border-b border-[#b35cff]/20">
+        <div className="p-3 border-b border-[#b35cff]/20 space-y-2">
           <button
             onClick={() => setIsAddingMemory(true)}
             className="w-full px-3 py-2 bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 
@@ -235,6 +293,28 @@ const MemoryList: React.FC<MemoryListProps> = ({
             <Plus className="w-4 h-4 text-[#b35cff]" />
             <span className="bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent ml-2 text-sm">
               New Memory
+            </span>
+          </button>
+
+          <button
+            onClick={generateQuestions}
+            disabled={memories.length === 0 || isGeneratingQuestions}
+            className={`w-full px-3 py-2 border rounded-lg transition-all duration-300
+                      flex items-center justify-center group
+                      ${memories.length === 0 || isGeneratingQuestions
+                        ? 'bg-gray-500/10 border-gray-500/20 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 border-[#b35cff]/20 hover:from-[#b35cff]/20 hover:to-[#ffad4a]/20'}`}
+            aria-label="Generate questions from memories"
+          >
+            {isGeneratingQuestions ? (
+              <Loader2 className="w-4 h-4 text-[#b35cff] animate-spin" />
+            ) : (
+              <Brain className="w-4 h-4 text-[#b35cff]" />
+            )}
+            <span className={`ml-2 text-sm ${memories.length === 0 || isGeneratingQuestions
+              ? 'text-gray-400'
+              : 'bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent'}`}>
+              Generate Questions
             </span>
           </button>
         </div>
@@ -435,6 +515,19 @@ const MemoryList: React.FC<MemoryListProps> = ({
           </motion.div>
         </div>
       )}
+
+      {/* Questions Modal */}
+      <QuestionsModal
+        isOpen={showQuestionsModal}
+        onClose={resetQuestionsAndAnswers}
+        isGenerating={isGeneratingQuestions}
+        questions={generatedQuestions}
+        answers={answers}
+        onAnswerChange={handleAnswerChange}
+        onSubmitAnswers={submitAnswers}
+        isSubmitting={isSubmittingAnswers}
+        feedback={feedback}
+      />
     </div>
   );
 };
