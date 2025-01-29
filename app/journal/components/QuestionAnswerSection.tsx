@@ -18,22 +18,34 @@ const QuestionAnswerSection: React.FC<QuestionAnswerSectionProps> = ({
   isSubmitting,
   feedback
 }) => {
+  // Determine if it's a long-form question by checking if there's only one answer field
+  const isLongForm = answers.length === 1;
+
   return (
     <div className="space-y-6">
       {!feedback ? (
         <>
           {answers.map((answer, index) => (
             <div key={index} className="space-y-2">
-              <label className="text-sm text-gray-400">Answer {index + 1}</label>
+              <label className="text-sm text-gray-400">
+                {isLongForm ? 'Long Answer Response' : `Answer ${index + 1}`}
+              </label>
               <textarea
                 value={answer}
                 onChange={(e) => onAnswerChange(index, e.target.value)}
-                placeholder="Type your answer here..."
-                className="w-full bg-[#1E1E2E] text-white border border-[#b35cff]/20 
+                placeholder={isLongForm 
+                  ? "Write your essay response here... Remember to structure your answer and include relevant examples."
+                  : "Type your answer here..."}
+                className={`w-full bg-[#1E1E2E] text-white border border-[#b35cff]/20 
                          rounded-lg px-3 py-2 text-sm placeholder-gray-500
                          focus:outline-none focus:ring-2 focus:ring-[#b35cff]/50
-                         min-h-[100px] resize-y"
+                         resize-y ${isLongForm ? 'min-h-[400px]' : 'min-h-[100px]'}`}
               />
+              {isLongForm && (
+                <div className="text-xs text-gray-400 mt-1">
+                  Tip: Use markdown for formatting (e.g., ## for headings, * for bullet points)
+                </div>
+              )}
             </div>
           ))}
 

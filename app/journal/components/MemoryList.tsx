@@ -5,10 +5,11 @@ import MemoryCard from './MemoryCard';
 import QuestionsModal from './QuestionsModal';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Plus, X, ArrowLeft, Check, AlertCircle, Brain, Loader2 } from 'lucide-react';
+import { Plus, X, ArrowLeft, Check, AlertCircle } from 'lucide-react';
 import debounce from 'lodash/debounce';
 import { generateQuestionsFromMemories, generateFeedbackForAnswers } from '../../utils/perplexityUtils';
 import FeedbackConfig, { FeedbackSettings } from './FeedbackConfig';
+import QuestionConfig, { QuestionConfig as QuestionConfigType } from './QuestionConfig';
 
 interface MemoryListProps {
   memories: Memory[];
@@ -55,6 +56,14 @@ const MemoryList: React.FC<MemoryListProps> = ({
     additionalNotes: ''
   });
   const [isFeedbackConfigExpanded, setIsFeedbackConfigExpanded] = useState(false);
+  const [questionConfig, setQuestionConfig] = useState<QuestionConfigType>({
+    type: 'single-long',
+    questionCount: 1,
+    marks: {
+      perQuestion: [20]
+    }
+  });
+  const [isQuestionConfigExpanded, setIsQuestionConfigExpanded] = useState(false);
 
   // Debounced auto-save function for editing existing memories
   const debouncedSave = useCallback(
@@ -231,17 +240,24 @@ const MemoryList: React.FC<MemoryListProps> = ({
   };
 
   const generateQuestions = async () => {
+    if (!memories[currentIndex]) return;
+    
     setIsGeneratingQuestions(true);
     setShowQuestionsModal(true);
     
     try {
-      // Concatenate all memories into a single string
-      const allMemoriesText = memories
-        .map(memory => memory.content)
-        .join('\n\n');
+      const memoryContent = memories[currentIndex].content;
 
-      const questions = await generateQuestionsFromMemories(allMemoriesText);
+      const questions = await generateQuestionsFromMemories(
+        memoryContent, 
+        questionConfig,
+        feedbackSettings
+      );
       setGeneratedQuestions(questions);
+      
+      // Reset answers array based on question count
+      setAnswers(Array(questionConfig.questionCount).fill(''));
+      
     } catch (error) {
       console.error('Error generating questions:', error);
       setGeneratedQuestions('Error generating questions. Please try again.');
@@ -274,7 +290,7 @@ const MemoryList: React.FC<MemoryListProps> = ({
   const resetQuestionsAndAnswers = () => {
     setShowQuestionsModal(false);
     setGeneratedQuestions(null);
-    setAnswers(Array(5).fill(''));
+    setAnswers(Array(questionConfig.questionCount).fill(''));
     setFeedback(null);
   };
 
@@ -290,7 +306,7 @@ const MemoryList: React.FC<MemoryListProps> = ({
         md:h-full h-[calc(100vh-48px)] md:top-0 top-12
       `}>
         {/* Sidebar Header */}
-        <div className="p-3 border-b border-[#b35cff]/20 space-y-2">
+        <div className="flex-shrink-0 p-3 border-b border-[#b35cff]/20 space-y-2">
           <button
             onClick={() => setIsAddingMemory(true)}
             className="w-full px-3 py-2 bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 
@@ -305,33 +321,12 @@ const MemoryList: React.FC<MemoryListProps> = ({
               New Memory
             </span>
           </button>
-
-          <button
-            onClick={generateQuestions}
-            disabled={memories.length === 0 || isGeneratingQuestions}
-            className={`w-full px-3 py-2 border rounded-lg transition-all duration-300
-                      flex items-center justify-center group
-                      ${memories.length === 0 || isGeneratingQuestions
-                        ? 'bg-gray-500/10 border-gray-500/20 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 border-[#b35cff]/20 hover:from-[#b35cff]/20 hover:to-[#ffad4a]/20'}`}
-            aria-label="Generate questions from memories"
-          >
-            {isGeneratingQuestions ? (
-              <Loader2 className="w-4 h-4 text-[#b35cff] animate-spin" />
-            ) : (
-              <Brain className="w-4 h-4 text-[#b35cff]" />
-            )}
-            <span className={`ml-2 text-sm ${memories.length === 0 || isGeneratingQuestions
-              ? 'text-gray-400'
-              : 'bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent'}`}>
-              Generate Questions
-            </span>
-          </button>
         </div>
 
-        {/* Memory List */}
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          <div className="p-4 space-y-2">
+        {/* Scrollable Container for Memory List and Preferences */}
+        <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
+          {/* Memory List */}
+          <div className="flex-1 p-4 space-y-2">
             {isAddingMemory && (
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -392,20 +387,26 @@ const MemoryList: React.FC<MemoryListProps> = ({
               </motion.div>
             ))}
           </div>
-        </div>
 
-        {/* Feedback Preferences */}
-        <div className="p-3 border-t border-[#b35cff]/20">
-          <FeedbackConfig
-            settings={feedbackSettings}
-            onSettingsChange={setFeedbackSettings}
-            isExpanded={isFeedbackConfigExpanded}
-            onToggleExpand={() => setIsFeedbackConfigExpanded(!isFeedbackConfigExpanded)}
-          />
+          {/* Question and Feedback Preferences */}
+          <div className="flex-shrink-0 p-3 space-y-2 border-t border-[#b35cff]/20">
+            <QuestionConfig
+              config={questionConfig}
+              onConfigChange={setQuestionConfig}
+              isExpanded={isQuestionConfigExpanded}
+              onToggleExpand={() => setIsQuestionConfigExpanded(!isQuestionConfigExpanded)}
+            />
+            <FeedbackConfig
+              settings={feedbackSettings}
+              onSettingsChange={setFeedbackSettings}
+              isExpanded={isFeedbackConfigExpanded}
+              onToggleExpand={() => setIsFeedbackConfigExpanded(!isFeedbackConfigExpanded)}
+            />
+          </div>
         </div>
 
         {/* Mobile Close Button */}
-        <div className="md:hidden border-t border-[#b35cff]/20">
+        <div className="flex-shrink-0 md:hidden border-t border-[#b35cff]/20">
           <button 
             onClick={() => setIsSidebarOpen(false)}
             className="w-full h-12 bg-[#1E1E2E] hover:bg-[#b35cff]/10
@@ -455,8 +456,8 @@ const MemoryList: React.FC<MemoryListProps> = ({
                   onChange={handleNewMemoryChange}
                   onKeyDown={handleKeyPress}
                   placeholder="Start typing your memory... (Markdown supported)"
-                  maxChars={5000}
                   autoFocus={true}
+                  maxChars={20000}
                 />
               </div>
             </div>
@@ -472,6 +473,8 @@ const MemoryList: React.FC<MemoryListProps> = ({
             onKeyDown={handleKeyPress}
             onToggleSidebar={() => setIsSidebarOpen(true)}
             autoSaveStatus={autoSaveStatus}
+            onGenerateQuestions={generateQuestions}
+            isGeneratingQuestions={isGeneratingQuestions}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center p-6">

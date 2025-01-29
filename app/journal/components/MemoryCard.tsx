@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import MemoryEditor from './MemoryEditor';
-import { Edit2, X, Menu, Check, AlertCircle } from 'lucide-react';
+import { Edit2, X, Menu, Check, AlertCircle, Loader2, Brain } from 'lucide-react';
 
 interface MemoryCardProps {
   memory: Memory;
@@ -16,6 +16,8 @@ interface MemoryCardProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   onToggleSidebar?: () => void;
   autoSaveStatus?: 'saved' | 'saving' | 'error' | null;
+  onGenerateQuestions: () => void;
+  isGeneratingQuestions: boolean;
 }
 
 const MemoryCard: React.FC<MemoryCardProps> = ({
@@ -27,7 +29,9 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
   onCancel,
   onKeyDown,
   onToggleSidebar,
-  autoSaveStatus
+  autoSaveStatus,
+  onGenerateQuestions,
+  isGeneratingQuestions
 }) => {
   const renderAutoSaveStatus = () => {
     if (!isEditing) return null;
@@ -77,6 +81,31 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
           {renderAutoSaveStatus()}
         </div>
         <div className="flex items-center space-x-4">
+          {!isEditing && (
+            <button
+              onClick={onGenerateQuestions}
+              disabled={isGeneratingQuestions}
+              className={`px-3 py-1.5 rounded-lg transition-all duration-200 text-sm
+                        flex items-center gap-2
+                        ${isGeneratingQuestions
+                          ? 'bg-gray-500/10 text-gray-400 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 text-white hover:from-[#b35cff]/20 hover:to-[#ffad4a]/20'
+                        }`}
+              aria-label="Generate questions for this memory"
+            >
+              {isGeneratingQuestions ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <Brain className="w-4 h-4" />
+                  <span>Generate Questions</span>
+                </>
+              )}
+            </button>
+          )}
           {isEditing ? (
             <button
               onClick={onCancel}
@@ -143,7 +172,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
           </span>
           {!isEditing && (
             <span className="text-sm text-gray-400">
-              {memory.content.length}/5000 characters
+              {memory.content.length}/20000 characters
             </span>
           )}
         </div>

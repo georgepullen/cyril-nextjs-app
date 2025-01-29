@@ -16,7 +16,7 @@ const MemoryEditor: React.FC<MemoryEditorProps> = ({
   onKeyDown,
   placeholder = "Add a new memory... (Markdown supported)",
   autoFocus = false,
-  maxChars = 5000,
+  maxChars = 20000,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
