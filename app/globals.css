@@ -2,20 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: rgb(2 6 23);
+:root[data-theme="light"] {
+  --background: #ffffff;
   --foreground: #171717;
+  --card-background: #f8f9fa;
+  --card-border: rgba(179, 92, 255, 0.1);
+  --text-primary: #1a1b1e;
+  --text-secondary: #4a4b4e;
+  --purple-primary: #b35cff;
+  --orange-primary: #ffad4a;
+  --gradient-overlay: linear-gradient(45deg, transparent 0%, rgba(179,92,255,0.02) 50%, rgba(255,173,74,0.02) 100%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root[data-theme="dark"] {
+  --background: #0D0D15;
+  --foreground: #ffffff;
+  --card-background: #1E1E2E;
+  --card-border: rgba(179, 92, 255, 0.2);
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --purple-primary: #b35cff;
+  --orange-primary: #ffad4a;
+  --gradient-overlay: linear-gradient(45deg, transparent 0%, rgba(179,92,255,0.05) 50%, rgba(255,173,74,0.05) 100%);
+}
+
+/* Default to dark theme */
+:root {
+  --background: #0D0D15;
+  --foreground: #ffffff;
+  --card-background: #1E1E2E;
+  --card-border: rgba(179, 92, 255, 0.2);
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --purple-primary: #b35cff;
+  --orange-primary: #ffad4a;
+  --gradient-overlay: linear-gradient(45deg, transparent 0%, rgba(179,92,255,0.05) 50%, rgba(255,173,74,0.05) 100%);
 }
 
 body {
-  color: var(--foreground);
+  color: var(--text-primary);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -27,24 +52,18 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
+  width: 8px;
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #265dd200;
+  background: linear-gradient(to bottom, var(--purple-primary), var(--orange-primary));
+  border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #1e4ea100;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #265dd200 transparent;
+::selection {
+  background: var(--purple-primary);
+  color: var(--background);
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

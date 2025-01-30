@@ -51,12 +51,6 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
     setMemories(prev => [newMemory, ...prev]);
   }, []);
 
-  const handleMemoryUpdated = useCallback((updatedMemory: Memory) => {
-    setMemories(prev => prev.map(memory => 
-      memory.id === updatedMemory.id ? updatedMemory : memory
-    ));
-  }, []);
-
   const handleMemoryDeleted = useCallback((deletedMemoryId: string) => {
     setMemories(prev => prev.filter(memory => memory.id !== deletedMemoryId));
     if (editingMemoryId === deletedMemoryId) {
@@ -149,7 +143,6 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
               memories={memories} 
               branchId={params.id}
               onMemoryAdded={handleMemoryAdded}
-              onMemoryUpdated={handleMemoryUpdated}
               onMemoryDeleted={handleMemoryDeleted}
               editingMemoryId={editingMemoryId}
               editContent={editContent}

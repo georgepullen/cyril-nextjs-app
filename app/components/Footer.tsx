@@ -1,60 +1,39 @@
-import React, { ReactNode } from 'react';
-import { HTMLMotionProps, motion } from 'framer-motion';
-import { Mail, Github, Linkedin } from 'lucide-react';
+'use client';
 
-const Footer = () => {
-    return (
-        <footer className="relative bg-[#0A0A12] py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-                    <div className="flex items-center space-x-6">
-                        <IconWrapper href="mailto:george@cyril.guru" aria-label="Email">
-                            <Mail className="w-4 h-4 text-[#b35cff]" />
-                        </IconWrapper>
-                        <IconWrapper href="https://github.com/georgepullen" aria-label="GitHub">
-                            <Github className="w-4 h-4 text-[#b35cff]" />
-                        </IconWrapper>
-                        <IconWrapper href="https://www.linkedin.com/in/george-pullen-73693027b/" aria-label="LinkedIn">
-                            <Linkedin className="w-4 h-4 text-[#b35cff]" />
-                        </IconWrapper>
-                    </div>
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useTheme } from '../contexts/ThemeContext';
 
-                    <div className="flex items-center space-x-6">
-                        <a href="/privacy" className="text-xs text-gray-500 hover:text-gray-400 transition-colors">
-                            Privacy
-                        </a>
-                        <span className="text-gray-700">•</span>
-                        <a href="/terms" className="text-xs text-gray-500 hover:text-gray-400 transition-colors">
-                            Terms
-                        </a>
-                        <span className="text-gray-700">•</span>
-                        <span className="text-xs text-gray-500">
-                            © {new Date().getFullYear()} CYRIL
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    );
+const Footer: React.FC = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <footer className="relative z-10 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Image
+              src="/logo.svg"
+              alt="Cyril Logo"
+              width={32}
+              height={32}
+              className="h-8 w-auto"
+            />
+            <span className={`font-bold text-lg ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              cyril.guru
+            </span>
+          </Link>
+
+          {/* Copyright */}
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            © {new Date().getFullYear()} Cyril. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
 };
-
-type IconWrapperProps = {
-    children: ReactNode;
-    href: string;
-} & HTMLMotionProps<"a">;
-
-const IconWrapper: React.FC<IconWrapperProps> = ({ children, href, ...props }) => (
-    <motion.a
-        href={href}
-        className="p-2 hover:bg-white/5 rounded-full transition-colors duration-200"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-    >
-        {children}
-    </motion.a>
-);
 
 export default Footer;

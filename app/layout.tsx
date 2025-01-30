@@ -3,10 +3,18 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css";
+import { Space_Mono } from 'next/font/google'
+import { ThemeProvider } from './contexts/ThemeContext'
+
+const spaceMono = Space_Mono({ 
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-space-mono',
+})
 
 export const metadata: Metadata = {
-  title: "Cyril",
-  description: "An LLM that evolves through conversation.",
+  title: "Cyril - Your Second Brain",
+  description: "Unlock your second brain with Cyril, the AI-powered journal that helps you learn and grow.",
 };
 
 export default function RootLayout({
@@ -25,9 +33,11 @@ export default function RootLayout({
         <link rel="manifest" href="/favicon/site.webmanifest" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
       </head>
-      <body className="antialiased">
+      <body className={spaceMono.className}>
         <AuthProvider>
+          <ThemeProvider>
             {children}
+          </ThemeProvider>
         </AuthProvider>
         <Analytics />
         <SpeedInsights />
