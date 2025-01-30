@@ -3,18 +3,20 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css";
-import { Space_Mono } from 'next/font/google'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { Toaster } from 'react-hot-toast';
+import LoadingScreen from './components/LoadingScreen';
 
-const spaceMono = Space_Mono({ 
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-space-mono',
+  display: 'swap',
+  variable: '--font-plus-jakarta',
 })
 
 export const metadata: Metadata = {
-  title: "Cyril - Your Second Brain",
-  description: "Unlock your second brain with Cyril, the AI-powered journal that helps you learn and grow.",
+  title: "Cyril - AI-Powered Knowledge Management",
+  description: "Transform your note-taking with advanced AI insights and intelligent organization.",
 };
 
 export default function RootLayout({
@@ -23,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning className={`${plusJakarta.variable}`}>
       <head>
         <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
@@ -33,10 +35,34 @@ export default function RootLayout({
         <link rel="manifest" href="/favicon/site.webmanifest" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
       </head>
-      <body className={spaceMono.className}>
+      <body>
         <AuthProvider>
           <ThemeProvider>
-            {children}
+            <LoadingScreen>
+              {children}
+              <Toaster 
+                position="bottom-right"
+                toastOptions={{
+                  style: {
+                    background: '#1A1A2E',
+                    color: '#fff',
+                    border: '1px solid rgba(179, 92, 255, 0.1)',
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: '#b35cff',
+                      secondary: '#1A1A2E',
+                    },
+                  },
+                  error: {
+                    iconTheme: {
+                      primary: '#ff4a4a',
+                      secondary: '#1A1A2E',
+                    },
+                  },
+                }}
+              />
+            </LoadingScreen>
           </ThemeProvider>
         </AuthProvider>
         <Analytics />

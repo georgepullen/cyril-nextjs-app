@@ -1,114 +1,178 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { stages } from './stages';
+import { Brain, BookText, TrendingUp, Lock, Zap, Users } from 'lucide-react';
 
 const RoadmapSection: React.FC = () => {
+    const milestones = [
+        {
+            title: "Cyrillectual Launch",
+            phase: "Phase 1",
+            date: "Q2 2024",
+            description: "Launch of our advanced knowledge management platform with AI-powered insights.",
+            features: [
+                "Neural processing engine",
+                "Automated categorization",
+                "Real-time collaboration"
+            ],
+            details: [
+                "Multi-language support",
+                "Custom knowledge frameworks",
+                "Intelligent search system",
+                "Advanced tagging algorithms"
+            ],
+            icon: BookText,
+            status: "current"
+        },
+        {
+            title: "Cyrillionaire Release",
+            phase: "Phase 2",
+            date: "Q3 2024",
+            description: "Introduction of our AI-driven market analysis and investment intelligence platform.",
+            features: [
+                "Market data integration",
+                "Predictive analytics",
+                "Risk assessment"
+            ],
+            details: [
+                "Multi-market analysis",
+                "Portfolio optimization",
+                "Automated strategies",
+                "Sentiment analysis"
+            ],
+            icon: TrendingUp,
+            status: "upcoming"
+        },
+        {
+            title: "Cyrebrum Integration",
+            phase: "Phase 3",
+            date: "Q4 2024",
+            description: "Complete cognitive enhancement platform with decision intelligence capabilities.",
+            features: [
+                "Universal sync system",
+                "Decision support AI",
+                "Knowledge visualization"
+            ],
+            details: [
+                "Unified data platform",
+                "Advanced analytics",
+                "Insight engine",
+                "Cross-platform API"
+            ],
+            icon: Brain,
+            status: "upcoming"
+        }
+    ];
+
     return (
-        <section className="relative pt-32 pb-20 min-h-screen flex items-center">
+        <section className="relative py-32 overflow-hidden bg-[#080B14]">
+            {/* Background Elements */}
             <div className="absolute inset-0">
-                <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-[#b35cff] opacity-[0.15] rounded-full blur-[100px]" />
-                <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-[#ffad4a] opacity-[0.15] rounded-full blur-[100px]" />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
+                <div className="absolute top-1/4 right-1/4 w-[800px] h-[800px] rounded-full"
+                     style={{ 
+                         background: 'radial-gradient(circle at center, var(--accent-primary) 0%, transparent 70%)',
+                         opacity: '0.03',
+                         filter: 'var(--blur-md)'
+                     }} />
+                <div className="absolute bottom-1/4 left-1/4 w-[800px] h-[800px] rounded-full"
+                     style={{ 
+                         background: 'radial-gradient(circle at center, var(--accent-secondary) 0%, transparent 70%)',
+                         opacity: '0.03',
+                         filter: 'var(--blur-md)'
+                     }} />
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 relative">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-16"
-                >
-                    <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-[#b35cff] via-white to-[#ffad4a] bg-clip-text text-transparent mb-6">
-                        The Cyril Experiment
-                    </h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-                        Your second brain - managing your knowledge, and helping you make the best decisions possible.
-                    </p>
-                </motion.div>
+            {/* Section Title */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="relative text-center mb-20"
+            >
+                <div className="badge inline-block mb-4">Implementation Timeline</div>
+                <h2 className="text-4xl md:text-5xl font-semibold text-gradient mb-6">
+                    Development Roadmap
+                </h2>
+                <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                    Our strategic approach to delivering next-generation cognitive enhancement solutions
+                </p>
+            </motion.div>
 
-                {/* Desktop Timeline */}
-                <div className="hidden md:block relative">
-                    {/* Connection Line */}
-                    <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-[#b35cff]/20 via-[#9747FF]/20 to-[#7B3FE4]/20" />
-                    
-                    <div className="grid grid-cols-3 gap-8">
-                        {stages.map((stage, index) => {
-                            const Icon = stage.icon;
-                            return (
-                                <motion.div
-                                    key={stage.title}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: index * 0.2 }}
-                                    className="relative pt-16 h-full group"
-                                >
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2">
-                                        <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${stage.gradient} flex items-center justify-center
-                                                     shadow-[0_0_20px_rgba(179,92,255,0.3)] transition-all duration-300
-                                                     group-hover:shadow-[0_0_30px_rgba(179,92,255,0.5)]`}>
-                                            <Icon className="w-6 h-6 text-white" />
-                                        </div>
-                                    </div>
-                                    <div className="relative">
-                                        {/* Glow Effect Container */}
-                                        <div className="absolute -inset-[1px] bg-gradient-to-r from-[#b35cff]/20 to-[#ffad4a]/20 rounded-lg blur-sm
-                                                      group-hover:from-[#b35cff]/30 group-hover:to-[#ffad4a]/30 transition-all duration-300" />
-                                        
-                                        {/* Card Content */}
-                                        <div className="relative bg-[#1A1A2E] rounded-lg p-6 border border-[#b35cff]/10 h-full flex flex-col
-                                                      backdrop-blur-3xl backdrop-saturate-200 transition-transform duration-300
-                                                      group-hover:translate-y-[-2px] group-hover:border-[#b35cff]/20">
-                                            <h3 className="text-xl font-bold bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent mb-2">
-                                                {stage.title}
-                                            </h3>
-                                            <div className="text-sm text-[#b35cff] mb-3">{stage.date}</div>
-                                            <p className="text-gray-400 text-sm flex-grow">
-                                                {stage.description}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Mobile Timeline */}
-                <div className="md:hidden space-y-8">
-                    {stages.map((stage, index) => {
-                        const Icon = stage.icon;
+            {/* Timeline Grid */}
+            <div className="section-container">
+                <div className="grid gap-12">
+                    {milestones.map((milestone, index) => {
+                        const Icon = milestone.icon;
                         return (
                             <motion.div
-                                key={stage.title}
-                                initial={{ opacity: 0, x: -20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
+                                key={milestone.title}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: index * 0.2 }}
-                                className="relative pl-8 border-l-2 border-[#b35cff]/20 group"
+                                transition={{ delay: index * 0.1 }}
+                                className="group"
                             >
-                                <div className="absolute left-0 top-0 -translate-x-1/2">
-                                    <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${stage.gradient} flex items-center justify-center
-                                                 shadow-[0_0_15px_rgba(179,92,255,0.3)] transition-all duration-300
-                                                 group-hover:shadow-[0_0_25px_rgba(179,92,255,0.5)]`}>
-                                        <Icon className="w-4 h-4 text-white" />
+                                <div className="card p-8">
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-16 h-16 rounded-lg bg-gradient-subtle
+                                                          flex items-center justify-center
+                                                          transition-all duration-300 group-hover:shadow-md">
+                                                <Icon className="w-8 h-8" style={{ color: 'var(--accent-primary)' }} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-3xl font-semibold text-gradient">
+                                                    {milestone.title}
+                                                </h3>
+                                                <div className="flex items-center gap-3 mt-2">
+                                                    <span className="text-sm font-medium" style={{ color: 'var(--accent-primary)' }}>
+                                                        {milestone.phase}
+                                                    </span>
+                                                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--border-medium)' }} />
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-2 h-2 rounded-full" style={{ 
+                                                            background: milestone.status === 'current' ? 'var(--accent-primary)' :
+                                                                       milestone.status === 'upcoming' ? 'var(--accent-secondary)' :
+                                                                       'var(--text-tertiary)'
+                                                        }} />
+                                                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                                                            {milestone.date}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="relative">
-                                    {/* Glow Effect Container */}
-                                    <div className="absolute -inset-[1px] bg-gradient-to-r from-[#b35cff]/20 to-[#ffad4a]/20 rounded-lg blur-sm
-                                                  group-hover:from-[#b35cff]/30 group-hover:to-[#ffad4a]/30 transition-all duration-300" />
-                                    
-                                    {/* Card Content */}
-                                    <div className="relative bg-[#1A1A2E] rounded-lg p-6 border border-[#b35cff]/10
-                                                  backdrop-blur-3xl backdrop-saturate-200 transition-transform duration-300
-                                                  group-hover:translate-y-[-2px] group-hover:border-[#b35cff]/20">
-                                        <h3 className="text-xl font-bold bg-gradient-to-r from-[#b35cff] to-[#ffad4a] bg-clip-text text-transparent mb-2">
-                                            {stage.title}
-                                        </h3>
-                                        <div className="text-sm text-[#b35cff] mb-3">{stage.date}</div>
-                                        <p className="text-gray-400 text-sm">
-                                            {stage.description}
-                                        </p>
+
+                                    {/* Content */}
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <div>
+                                            <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Overview</h4>
+                                            <p className="text-base mb-6" style={{ color: 'var(--text-secondary)' }}>
+                                                {milestone.description}
+                                            </p>
+                                            <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Core Features</h4>
+                                            <ul className="space-y-3">
+                                                {milestone.features.map((feature, idx) => (
+                                                    <li key={idx} className="flex items-center gap-3 text-sm">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-gradient" />
+                                                        <span style={{ color: 'var(--text-secondary)' }}>{feature}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Technical Details</h4>
+                                            <ul className="space-y-3">
+                                                {milestone.details.map((detail, idx) => (
+                                                    <li key={idx} className="flex items-center gap-3 text-sm">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-gradient" />
+                                                        <span style={{ color: 'var(--text-secondary)' }}>{detail}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>

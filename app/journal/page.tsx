@@ -288,7 +288,7 @@ export default function JournalPage() {
         <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-[#ffad4a] opacity-[0.07] rounded-full blur-[100px]" />
       </div>
 
-      <Navbar scrolled={true} />
+      <Navbar />
 
       {/* Main Content */}
       <div className="relative z-10 pt-32 pb-16 px-4 md:px-8 max-w-7xl mx-auto">

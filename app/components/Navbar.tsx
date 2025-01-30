@@ -1,90 +1,139 @@
 "use client"
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Linkedin } from 'lucide-react';
+import { Linkedin, Menu, X } from 'lucide-react';
 import Image from 'next/image';
-import { ThemeToggle } from './ThemeToggle';
-import { useTheme } from '../contexts/ThemeContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface NavbarProps {
-    scrolled: boolean;
-}
+export const Navbar: React.FC = () => {
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-export const Navbar: React.FC<NavbarProps> = ({ scrolled }) => {
-    const { theme } = useTheme();
-    
+    useEffect(() => {
+        const checkScroll = () => {
+            setIsScrolled(window.scrollY > 0);
+        };
+        checkScroll();
+        window.addEventListener('scroll', checkScroll, { passive: true });
+        return () => window.removeEventListener('scroll', checkScroll);
+    }, []);
+
     return (
-        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-            scrolled 
-                ? theme === 'dark'
-                    ? 'bg-[#0D0D15]/80 backdrop-blur-md border-b border-[#b35cff]/20'
-                    : 'bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100'
-                : theme === 'dark'
-                    ? 'bg-transparent'
-                    : 'bg-gradient-to-b from-white/80 to-white/40 backdrop-blur-sm border-b border-white/[0.15]'
-        }`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ease-in-out
+            ${isScrolled 
+                ? 'bg-black/95 backdrop-blur-md border-b border-white/5 shadow-lg py-4' 
+                : 'bg-transparent py-6'}`}
+        >
+            <div className="section-container">
+                <div className="flex items-center justify-between">
                     {/* Logo */}
-                    <div className="flex-shrink-0">
-                        <Link href="/" className="flex items-center group">
-                            <div className={`rounded-lg transition-colors duration-200 ${
-                                theme === 'light' ? 'bg-white/40 backdrop-blur-sm' : ''
-                            }`}>
-                                <Image
-                                    src="/logo.svg"
-                                    alt="Cyril Logo"
-                                    width={32}
-                                    height={32}
-                                    className="h-8 w-auto"
-                                />
-                            </div>
-                            <span className={`ml-2 font-bold text-lg transition-colors duration-200
-                                ${theme === 'dark' 
-                                    ? 'text-white group-hover:text-[#b35cff]' 
-                                    : 'text-gray-800 group-hover:text-[#b35cff]'}`}>
-                                cyril.guru
-                            </span>
+                    <Link href="/" className="flex items-center group">
+                        <div className="relative w-8 h-8">
+                            <Image
+                                src="/logo.svg"
+                                alt="Cyril Logo"
+                                width={32}
+                                height={32}
+                                className="transition-transform duration-300 group-hover:scale-110"
+                            />
+                        </div>
+                        <span className="ml-3 text-lg font-semibold tracking-tight">
+                            cyril.guru
+                        </span>
+                    </Link>
+
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:flex items-center space-x-8">
+                        <Link href="/journal" className="text-gray-300 hover:text-white transition-colors">
+                            Journal
                         </Link>
-                    </div>
-
-                    {/* Right Side Items */}
-                    <div className="flex items-center space-x-6">
-                        {/* Theme Toggle */}
-                        <ThemeToggle />
-
-                        {/* Divider */}
-                        <div className={`h-5 w-px ${
-                            theme === 'dark'
-                                ? 'bg-gradient-to-b from-[#b35cff]/20 to-[#ffad4a]/20'
-                                : 'bg-gray-200/70'
-                        }`} />
-
-                        {/* Creator Credit */}
-                        <div className="flex items-center space-x-3">
-                            <span className={`text-sm font-medium transition-colors duration-200 ${
-                                theme === 'dark' 
-                                    ? 'text-gray-400 hover:text-gray-300' 
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}>
+                        <Link href="#solutions" className="text-gray-300 hover:text-white transition-colors">
+                            Solutions
+                        </Link>
+                        <Link href="#roadmap" className="text-gray-300 hover:text-white transition-colors">
+                            Roadmap
+                        </Link>
+                        <div className="h-4 w-px bg-gradient-subtle" />
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm text-gray-300">
                                 by George Pullen
                             </span>
                             <Link
                                 href="https://www.linkedin.com/in/george-pullen-73693027b/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`p-2 rounded-lg transition-all duration-200
-                                    ${theme === 'dark'
-                                        ? 'hover:bg-[#b35cff]/10 text-[#b35cff]'
-                                        : 'hover:bg-white/60 text-[#9340d3] hover:text-[#b35cff]'
-                                    }`}
+                                className="p-2 rounded-lg transition-all duration-200 
+                                         hover:bg-gradient-primary group"
+                                style={{ background: 'var(--gradient-subtle)' }}
                             >
-                                <Linkedin className="w-5 h-5" />
+                                <Linkedin className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
                             </Link>
                         </div>
                     </div>
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        className="p-2 md:hidden rounded-lg"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle menu"
+                        style={{ background: 'var(--gradient-subtle)' }}
+                    >
+                        {isMobileMenuOpen ? (
+                            <X className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+                        ) : (
+                            <Menu className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+                        )}
+                    </button>
                 </div>
             </div>
+
+            {/* Mobile Menu */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.2 }}
+                        className="bg-black/95 backdrop-blur-md border-t border-white/5 md:hidden py-4 px-4 mt-4"
+                    >
+                        <div className="flex flex-col space-y-4">
+                            <Link href="/journal" 
+                                  className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5"
+                                  onClick={() => setIsMobileMenuOpen(false)}>
+                                Journal
+                            </Link>
+                            <Link href="#solutions" 
+                                  className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5"
+                                  onClick={() => setIsMobileMenuOpen(false)}>
+                                Solutions
+                            </Link>
+                            <Link href="#roadmap" 
+                                  className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5"
+                                  onClick={() => setIsMobileMenuOpen(false)}>
+                                Roadmap
+                            </Link>
+                            <div className="h-px bg-white/5 my-2" />
+                            <div className="flex items-center justify-between px-4 py-2">
+                                <span className="text-sm text-gray-300">
+                                    by George Pullen
+                                </span>
+                                <Link
+                                    href="https://www.linkedin.com/in/george-pullen-73693027b/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-2 rounded-lg transition-all duration-200 
+                                             hover:bg-gradient-primary"
+                                    style={{ background: 'var(--gradient-subtle)' }}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    <Linkedin className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+                                </Link>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </nav>
     );
 };
