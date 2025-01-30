@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Linkedin, Github, Twitter } from 'lucide-react';
+import { Linkedin, Github } from 'lucide-react';
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
@@ -13,11 +13,6 @@ const Footer: React.FC = () => {
             { name: 'Journal', href: '/journal' },
             { name: 'Solutions', href: '#solutions' },
             { name: 'Roadmap', href: '#roadmap' },
-        ],
-        company: [
-            { name: 'About', href: '#' },
-            { name: 'Privacy', href: '#' },
-            { name: 'Terms', href: '#' },
         ],
         social: [
             {
@@ -29,17 +24,12 @@ const Footer: React.FC = () => {
                 name: 'GitHub',
                 href: 'https://github.com/georgepullen',
                 icon: Github
-            },
-            {
-                name: 'Twitter',
-                href: 'https://twitter.com/georgepullen',
-                icon: Twitter
-            },
+            }
         ],
     };
 
     return (
-        <footer className="relative mt-32 bg-[#080B14]">
+        <footer className="relative bg-[#080B14]">
             <div className="absolute inset-0">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
             </div>
@@ -89,27 +79,13 @@ const Footer: React.FC = () => {
                         </div>
 
                         {/* Navigation */}
-                        <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
+                        <div className="mt-16 xl:col-span-2 xl:mt-0">
                             <div>
                                 <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
                                     Product
                                 </h3>
                                 <ul className="mt-4 space-y-3">
                                     {navigation.product.map((item) => (
-                                        <li key={item.name}>
-                                            <Link href={item.href} className="nav-link text-sm">
-                                                {item.name}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                    Company
-                                </h3>
-                                <ul className="mt-4 space-y-3">
-                                    {navigation.company.map((item) => (
                                         <li key={item.name}>
                                             <Link href={item.href} className="nav-link text-sm">
                                                 {item.name}

@@ -88,15 +88,15 @@ const HeroSection: React.FC = () => {
                     >
                         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.1]">
                             <span className="text-gradient">
-                                Your Mind,
+                                Your Personal
                             </span>
                             <br />
                             <span className="text-gradient">
-                                Amplified
+                                AI Guru
                             </span>
                         </h1>
                         <p className="max-w-2xl mx-auto text-xl sm:text-2xl md:text-3xl" style={{ color: 'var(--text-secondary)' }}>
-                            Cognitive enhancement through artificial intelligence
+                            For studying, investing and more
                         </p>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -128,8 +128,8 @@ const HeroSection: React.FC = () => {
                         className="text-center mb-20"
                     >
                         <div className="badge inline-block mb-4">Our Solutions</div>
-                        <h2 className="text-4xl md:text-5xl font-semibold text-gradient mb-6">
-                            Intelligent Solutions for Modern Minds
+                        <h2 className="text-4xl md:text-5xl font-semibold text-gradient mb-6 py-4">
+                            Intelligent Solutions For Modern Minds
                         </h2>
                         <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                             Harness the power of artificial intelligence to enhance your cognitive capabilities

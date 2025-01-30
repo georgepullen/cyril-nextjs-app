@@ -15,7 +15,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Cyril - AI-Powered Knowledge Management",
+  title: "Cyril - Your AI Guru",
   description: "Transform your note-taking with advanced AI insights and intelligent organization.",
 };
 
@@ -33,9 +33,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-title" content="Cyril" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body>
+      <body className="min-h-screen overflow-x-hidden">
         <AuthProvider>
           <ThemeProvider>
             <LoadingScreen>

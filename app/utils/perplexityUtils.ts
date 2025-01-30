@@ -1,5 +1,5 @@
-import { FeedbackSettings } from '../journal/components/FeedbackConfig';
-import { QuestionConfig } from '../journal/components/QuestionConfig';
+import { FeedbackSettings } from '../cyrillectual/components/FeedbackConfig';
+import { QuestionConfig } from '../cyrillectual/components/QuestionConfig';
 
 interface PerplexityResponse {
   id: string;

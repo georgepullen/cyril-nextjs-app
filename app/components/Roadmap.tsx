@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, BookText, TrendingUp, Lock, Zap, Users } from 'lucide-react';
+import { Brain, BookText, TrendingUp } from 'lucide-react';
 
 const RoadmapSection: React.FC = () => {
     const milestones = [
@@ -8,17 +8,16 @@ const RoadmapSection: React.FC = () => {
             title: "Cyrillectual Launch",
             phase: "Phase 1",
             date: "Q2 2024",
-            description: "Launch of our advanced knowledge management platform with AI-powered insights.",
+            description: "Launch of retention-focused notes app.",
             features: [
-                "Neural processing engine",
-                "Automated categorization",
-                "Real-time collaboration"
+                "AI generated questions",
+                "Exam board specific feedback",
+                "Ambient learning"
             ],
             details: [
-                "Multi-language support",
-                "Custom knowledge frameworks",
-                "Intelligent search system",
-                "Advanced tagging algorithms"
+                "Markdown support",
+                "Real-time web search",
+                "Organise notes into branches",
             ],
             icon: BookText,
             status: "current"
@@ -27,7 +26,7 @@ const RoadmapSection: React.FC = () => {
             title: "Cyrillionaire Release",
             phase: "Phase 2",
             date: "Q3 2024",
-            description: "Introduction of our AI-driven market analysis and investment intelligence platform.",
+            description: "Cyril-driven market analysis and investment intelligence platform.",
             features: [
                 "Market data integration",
                 "Predictive analytics",
@@ -46,17 +45,14 @@ const RoadmapSection: React.FC = () => {
             title: "Cyrebrum Integration",
             phase: "Phase 3",
             date: "Q4 2024",
-            description: "Complete cognitive enhancement platform with decision intelligence capabilities.",
+            description: "Cognitive enhancement platform with decision intelligence capabilities.",
             features: [
-                "Universal sync system",
-                "Decision support AI",
-                "Knowledge visualization"
+                "Integration with other solutions",
+                "Task automation",
+                "Communication automation"
             ],
             details: [
-                "Unified data platform",
-                "Advanced analytics",
-                "Insight engine",
-                "Cross-platform API"
+                "To be confirmed",
             ],
             icon: Brain,
             status: "upcoming"
@@ -64,7 +60,7 @@ const RoadmapSection: React.FC = () => {
     ];
 
     return (
-        <section className="relative py-32 overflow-hidden bg-[#080B14]">
+        <section id="roadmap" className="relative py-32 overflow-hidden bg-[#080B14]">
             {/* Background Elements */}
             <div className="absolute inset-0">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
@@ -90,7 +86,7 @@ const RoadmapSection: React.FC = () => {
                 className="relative text-center mb-20"
             >
                 <div className="badge inline-block mb-4">Implementation Timeline</div>
-                <h2 className="text-4xl md:text-5xl font-semibold text-gradient mb-6">
+                <h2 className="text-4xl md:text-5xl font-semibold text-gradient mb-6 py-4">
                     Development Roadmap
                 </h2>
                 <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>

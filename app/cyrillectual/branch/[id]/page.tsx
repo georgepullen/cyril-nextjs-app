@@ -75,7 +75,7 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
 
   if (isAuthLoading) {
     return (
-      <main className="min-h-screen bg-[#0D0D15] text-white font-mono flex items-center justify-center">
+      <main className="min-h-screen bg-[#0D0D15] text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#b35cff] mx-auto mb-4" />
           <p className="text-gray-400">Loading session...</p>
@@ -89,7 +89,7 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <main className="h-screen flex flex-col bg-[#0D0D15] text-white font-mono overflow-hidden">
+    <main className="h-screen flex flex-col bg-[#0D0D15] text-white overflow-hidden">
       {/* Gradient Background Effect */}
       <div className="fixed inset-0 pointer-events-none bg-[linear-gradient(45deg,transparent_0%,rgba(179,92,255,0.05)_50%,rgba(255,173,74,0.05)_100%)] animate-[gradientShift_10s_ease-in-out_infinite] z-0" />
 
@@ -97,7 +97,7 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
       <div className="flex-shrink-0 z-50 bg-[#0D0D15]/80 backdrop-blur-md border-b border-[#b35cff]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
           <button
-            onClick={() => router.push('/journal')}
+            onClick={() => router.push('/cyrillectual')}
             className="group flex items-center space-x-2 hover:opacity-80 transition-opacity"
           >
             <ArrowLeft className="w-5 h-5 text-[#b35cff]" />
@@ -165,19 +165,40 @@ export default function ViewBranchPage({ params }: { params: { id: string } }) {
           100% { background-position: 0% 50%; }
         }
 
+        /* Firefox */
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: #b35cff #0D0D15;
+        }
+
+        /* Chrome, Edge, and Safari */
         ::-webkit-scrollbar {
-          width: 8px;
+          width: 10px;
+          height: 10px;
+          background: #0D0D15;
+        }
+
+        ::-webkit-scrollbar-track {
           background: #0D0D15;
         }
 
         ::-webkit-scrollbar-thumb {
           background: linear-gradient(to bottom, #b35cff, #ffad4a);
-          border-radius: 4px;
+          border: 2px solid #0D0D15;
+          border-radius: 100vh;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #c77fff, #ffbe6b);
+        }
+
+        ::-webkit-scrollbar-corner {
+          background: #0D0D15;
         }
 
         ::selection {
-          background: #b35cff;
-          color: #0D0D15;
+          background: rgba(179,92,255,0.3);
+          color: #ffffff;
         }
       `}</style>
     </main>

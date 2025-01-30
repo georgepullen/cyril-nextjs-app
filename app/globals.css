@@ -147,6 +147,7 @@ nav {
 /* Prevent layout shifts during loading */
 html {
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
 }
 
 /* Animation Keyframes */

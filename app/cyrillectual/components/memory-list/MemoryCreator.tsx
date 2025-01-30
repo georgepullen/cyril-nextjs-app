@@ -39,8 +39,8 @@ export const MemoryCreator: React.FC<MemoryCreatorProps> = ({
         console.error('Auto-save error:', error);
         setAutoSaveStatus('error');
       }
-    }, 2000), // Increased debounce time to 2 seconds for new memories
-    [branchId, onMemoryAdded, setNewMemory, setAutoSaveStatus]
+    }, 1000),
+    [branchId, setAutoSaveStatus]
   );
 
   // Handle new memory content changes with auto-save

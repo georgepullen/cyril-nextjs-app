@@ -7,7 +7,6 @@ import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { format, isToday, isYesterday, isSameWeek, isSameMonth, isSameYear } from 'date-fns';
 import { useRouter } from 'next/navigation';
-import { Navbar } from '../components/Navbar';
 import { BookText, Plus } from 'lucide-react';
 
 interface GroupedBranches {
@@ -17,7 +16,7 @@ interface GroupedBranches {
   };
 }
 
-export default function JournalPage() {
+export default function CyrillectualPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { session, isLoading: isAuthLoading } = useAuth();
@@ -206,7 +205,7 @@ export default function JournalPage() {
                       className="group relative"
                     >
                       <Link
-                        href={`/journal/branch/${branch.id}`}
+                        href={`/cyrillectual/branch/${branch.id}`}
                         className="block"
                       >
                         <div className="relative pl-8 py-4 pr-4 rounded-xl 
@@ -266,7 +265,7 @@ export default function JournalPage() {
 
   if (isAuthLoading) {
     return (
-      <main className="min-h-screen bg-[#0D0D15] text-white font-mono flex items-center justify-center">
+      <main className="min-h-screen bg-[#0D0D15] text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#b35cff] mx-auto mb-4" />
           <p className="text-gray-400">Loading session...</p>
@@ -280,15 +279,13 @@ export default function JournalPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0D0D15] text-white font-mono overflow-y-scroll">
+    <main className="min-h-screen bg-[#0D0D15] text-white overflow-y-scroll">
       {/* Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_0%,rgba(179,92,255,0.05)_50%,rgba(255,173,74,0.05)_100%)] animate-[gradientShift_10s_ease-in-out_infinite]" />
         <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-[#b35cff] opacity-[0.07] rounded-full blur-[100px]" />
         <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-[#ffad4a] opacity-[0.07] rounded-full blur-[100px]" />
       </div>
-
-      <Navbar />
 
       {/* Main Content */}
       <div className="relative z-10 pt-32 pb-16 px-4 md:px-8 max-w-7xl mx-auto">
@@ -301,11 +298,11 @@ export default function JournalPage() {
                          bg-gradient-to-r from-[#b35cff]/10 to-[#ffad4a]/10 border border-[#b35cff]/20">
             <BookText className="w-8 h-8 text-[#b35cff]" />
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#b35cff] via-white to-[#ffad4a] bg-clip-text text-transparent mb-6">
-            Your Memory Journal
+          <h1 className="py-2 text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#b35cff] via-white to-[#ffad4a] bg-clip-text text-transparent mb-6">
+            Cyrillectual
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Take your lecture/meeting notes using the Cyril Journal. When Cyril awakens in Q3 2025, he will have access to all of your memories.
+            Take your lesson notes using Cyrillectual, and generate exam board specific synthetic questions.
           </p> 
         </motion.div>
 
@@ -465,15 +462,38 @@ export default function JournalPage() {
           100% { background-position: 0% 50%; }
         }
 
-        /* Always show scrollbar to prevent layout shift */
-        html {
-          overflow-y: scroll;
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE and Edge */
+        /* Firefox */
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: #b35cff #0D0D15;
         }
 
-        /* Hide all scrollbars */
-        html::-webkit-scrollbar,
+        /* Chrome, Edge, and Safari */
+        ::-webkit-scrollbar {
+          width: 10px;
+          height: 10px;
+          background: #0D0D15;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: #0D0D15;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #b35cff, #ffad4a);
+          border: 2px solid #0D0D15;
+          border-radius: 100vh;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #c77fff, #ffbe6b);
+        }
+
+        ::-webkit-scrollbar-corner {
+          background: #0D0D15;
+        }
+
+        /* Hide scrollbars for internal elements */
         .overflow-y-scroll::-webkit-scrollbar,
         .overflow-y-auto::-webkit-scrollbar {
           display: none;
